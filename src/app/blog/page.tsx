@@ -1,5 +1,11 @@
+import { Flex, Text, Button } from "@radix-ui/themes";
+
 export default async function Page() {
 
-    return (<h1>Blog Page</h1>)
+    return (
+    <Flex direction="column" gap="2">
+        <Text>Hello from Blog :)</Text>
+        <Button>Let's go</Button>
+    </Flex>)
     
 }
