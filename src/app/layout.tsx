@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "@radix-ui/themes/styles.css";
-import { Theme, ThemePanel  } from "@radix-ui/themes";
-import { Provider,useAtom } from "jotai";
-import { myStore, themeColor } from "./store/store";
+import { Theme  } from "@radix-ui/themes";
+import { Provider } from "jotai";
+import { myStore } from "./store/store";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
