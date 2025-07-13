@@ -2,22 +2,22 @@
 
 import { redirect } from 'next/navigation';
 import { useEffect } from 'react';
-import { useAuth } from '@/features/auth/hooks/useAuth';
+import { useAuth } from '@/features/auth/hooks/useAuthActions';
 
 export default function ProtectedLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
 
   useEffect(() => {
-    if (!loading && !isAuthenticated) {
+    if (!isLoading && !isAuthenticated) {
       redirect('/auth/login');
     }
-  }, [isAuthenticated, loading]);
+  }, [isAuthenticated, isLoading]);
 
-  if (loading) return <div>Loading...</div>;
+  if (isLoading) return <div>Loading...</div>;
 
   return <>{children}</>;
 }
