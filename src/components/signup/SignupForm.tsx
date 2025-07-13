@@ -26,7 +26,7 @@ export const SignupForm = () => {
       await signup(data);
       toast.success('Account created successfully!');
     } catch (error) {
-      toast.error('Failed to create account. Please try again.');
+      toast.error(`Failed to create account. Please try again: ${error}`);
     }
   };
 

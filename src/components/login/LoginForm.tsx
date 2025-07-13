@@ -29,7 +29,7 @@ export default function LoginForm() {
       );
       toast.success('OTP sent to your phone number');
     } catch (error) {
-      toast.error('Failed to send OTP. Please try again.');
+      toast.error(`Failed to send OTP. Please try again : ${error}`);
     }
   };
 
@@ -72,7 +72,7 @@ export default function LoginForm() {
 
         <Flex direction="column" gap="2" align="center">
           <Text align="center" size="2">
-            Don't have an account?
+            Do not have an account?
           </Text>
           <Button
             variant="soft"
