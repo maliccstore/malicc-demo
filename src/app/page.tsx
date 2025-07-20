@@ -8,6 +8,9 @@ export default function Home() {
         <Link href="/product" style={{ color: 'blue' }}>
           See all Products
         </Link>
+        <Link href="/explore" style={{ color: 'blue' }}>
+          Explore
+        </Link>
         <BlogPage />
       </main>
     </div>
