@@ -3,28 +3,46 @@
 @tailwind utilities;
 
 :root {
-  --background: white;
-  --foreground: black;
-  --primary: #0070f3;
-  --primary-foreground: white;
+  height: fit-content;
 }
-
-[data-theme='dark'] {
-  --background: black;
-  --foreground: white;
-  --primary: #0070f3;
-  --primary-foreground: white;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Add this to your existing globals.css */
+@layer utilities {
+  .mobile-only {
+    /* Set a maximum width that matches common mobile devices */
+    max-width: 425px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  .pb-20 {
+    padding-bottom: 5rem; /* Adjust this value based on your navigation height */
+  }
+
+  .min-h-screen {
+    min-height: 100vh;
+  }
+  /* Hide on desktop */
+  @media (min-width: 769px) {
+    .desktop-message {
+      display: block;
+    }
+    .mobile-content {
+      display: none;
+    }
+  }
+
+  /* Show on mobile */
+  @media (max-width: 768px) {
+    .desktop-message {
+      display: none;
+    }
+    .mobile-content {
+      display: block;
+    }
+  }
 }
