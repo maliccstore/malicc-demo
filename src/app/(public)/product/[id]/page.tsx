@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
 import { Product } from '@/types/product';
 import { Box, Container } from '@radix-ui/themes';
+import Image from 'next/image';
 
 const ProductPage = () => {
   const params = useParams();
@@ -22,7 +23,9 @@ const ProductPage = () => {
   return (
     <Container className="product-page p-4">
       <Box>
-        <img
+        <Image
+          width={400} // fixed numeric value
+          height={300} // fixed numeric value
           src={product.image}
           alt={product.name}
           className="w-full max-h-96 object-contain"
