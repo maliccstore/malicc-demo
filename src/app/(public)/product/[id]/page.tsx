@@ -1,13 +1,12 @@
 'use client'; // Essential for client-side hooks and Redux
 
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
 import { Product } from '@/types/product';
 import { Box, Container } from '@radix-ui/themes';
 
 const ProductPage = () => {
-  const router = useRouter();
   const params = useParams();
   const id = params.id as string; // Type assertion if needed
 

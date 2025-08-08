@@ -4,9 +4,7 @@ import { useAppSelector } from '@/store/hooks';
 // import products from '@/data/products';
 import { Box, Container, Flex } from '@radix-ui/themes';
 export default function NewPage() {
-  const { products, loading, error } = useAppSelector(
-    (state) => state.products
-  );
+  const { products } = useAppSelector((state) => state.products);
   return (
     <Flex gap={'2'} align={'center'} direction={{ initial: 'column' }}>
       <h1>Product Page</h1>
