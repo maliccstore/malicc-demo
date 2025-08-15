@@ -1,7 +1,7 @@
 'use client';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { Button } from '../ui/button';
+import { Button } from '../ui/Button';
 import { Product } from '@/types/product';
 import { Heading, Text, Card } from '@radix-ui/themes';
 

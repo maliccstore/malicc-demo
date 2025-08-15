@@ -1,20 +1,29 @@
 'use client'; // Essential for client-side hooks and Redux
 
 import { useParams } from 'next/navigation';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store';
 import { Product } from '@/types/product';
 import { Box, Container } from '@radix-ui/themes';
 import Image from 'next/image';
+import { addToCart } from '@/store/slices/cartSlice';
 
 const ProductPage = () => {
   const params = useParams();
-  const id = params.id as string; // Type assertion if needed
+  const dispatch = useDispatch();
+  const id = Number(params.id); // Convert to number explicitly
 
   // Get product from Redux store
   const product = useSelector((state: RootState) =>
     state.products.products.find((p: Product) => p.id === id)
   );
+
+  const handleAddToCart = () => {
+    if (product) {
+      console.log(product);
+      dispatch(addToCart(product));
+    }
+  };
 
   if (!product) {
     return <div>Product not found</div>;
@@ -37,7 +46,10 @@ const ProductPage = () => {
         <p className="text-gray-700">{product.description}</p>
       </div>
       <div className="sticky bottom-12 flex justify-center">
-        <button className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors max-w-md w-full">
+        <button
+          onClick={handleAddToCart}
+          className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors max-w-md w-full"
+        >
           Add to Cart
         </button>
       </div>

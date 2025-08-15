@@ -1,19 +1,28 @@
-// features/cart/CartIcon.tsx
 'use client';
+import { ShoppingCart } from 'lucide-react';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store';
+// import { useDispatch } from 'react-redux';
+// import { toggleCart } from '../../store/slices/cartSlice';
 
-import { useCartStore } from '@/store/slices/cartStore';
-
-export default function CartIcon() {
-  // const items = useCartStore((state) => state.items);
-  const items = useCartStore();
+const CartIcon = () => {
+  const { totalQuantity } = useSelector((state: RootState) => state.cart);
+  // const dispatch = useDispatch();
 
   return (
-    <div className="relative">
-      {items.length > 0 && (
-        <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full h-5 w-5 flex items-center justify-center text-xs">
-          {items.length}
+    <button
+      className="relative p-2"
+      // onClick={() => dispatch(toggleCart())}
+      aria-label="Cart"
+    >
+      <ShoppingCart className="h-6 w-6" />
+      {totalQuantity > 0 && (
+        <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+          {totalQuantity}
         </span>
       )}
-    </div>
+    </button>
   );
-}
+};
+
+export default CartIcon;
