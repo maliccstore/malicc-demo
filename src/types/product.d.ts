@@ -1,7 +1,10 @@
+import { Rating } from './rating';
+
 export type Product = {
-  id: string;
+  id: number;
   name: string;
   description: string;
   image: string;
-  price: string;
+  price: number;
+  rating: Rating;
 };
