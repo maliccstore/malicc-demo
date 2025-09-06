@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import appReducer from './slices/appSlice';
 import cartReducer from './slices/cartSlice';
+import healthReducer from './slices/healthSlice';
 import productReducer from './slices/productSlice';
 import { loadState, saveState } from './cartPersist';
 const preloadedState = {
@@ -13,6 +14,7 @@ export const makeStore = () => {
       app: appReducer,
       cart: cartReducer,
       products: productReducer,
+      health: healthReducer,
       // Add other reducers here
     },
     preloadedState,
