@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect } from 'react';
 import { useHealth } from '@/features/health/hooks/useHealth';
 import { Button } from '@/components/ui/Button';
 
@@ -14,10 +13,6 @@ export default function HealthPage() {
     ping,
     clearError,
   } = useHealth();
-
-  useEffect(() => {
-    checkServerHealth();
-  }, [checkServerHealth]);
 
   const handleRefresh = () => {
     clearError();
@@ -93,6 +88,12 @@ export default function HealthPage() {
                 </h4>
                 <p className="text-sm text-yellow-900 mt-1">
                   {new Date(status.timestamp).toLocaleString()}
+                </p>
+              </div>
+              <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
+                <h4 className="text-sm font-medium text-yellow-800">Ping</h4>
+                <p className="text-sm text-yellow-900 mt-1">
+                  {lastChecked || 'No ping response'}
                 </p>
               </div>
             </div>
