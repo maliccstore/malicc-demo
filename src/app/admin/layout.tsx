@@ -1,4 +1,6 @@
-// src/app/admin/layout.tsx
+// src/app/admin/layout.tsx - Updated with hamburger inside container
+
+import MobileSidebar from '@/components/admin/layout/AdminSidebar';
 
 export default function AdminLayout({
   children,
@@ -6,10 +8,13 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen bg-muted/40">
-      <div className="flex flex-1 flex-col">
-        <main className="flex-1 p-6">{children}</main>
-      </div>
+    <div className="min-h-screen bg-gray-50">
+      <MobileSidebar />
+
+      {/* Main content area */}
+
+      {/* Content */}
+      <main>{children}</main>
     </div>
   );
 }
