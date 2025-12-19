@@ -1,6 +1,6 @@
 // src/app/admin/layout.tsx - Updated with hamburger inside container
 
-import MobileSidebar from '@/components/admin/layout/AdminSidebar';
+import AdminSidebar from '@/components/admin/layout/AdminSidebar';
 
 export default function AdminLayout({
   children,
@@ -9,11 +9,7 @@ export default function AdminLayout({
 }) {
   return (
     <div className="min-h-screen bg-gray-50">
-      <MobileSidebar />
-
-      {/* Main content area */}
-
-      {/* Content */}
+      <AdminSidebar />
       <main>{children}</main>
     </div>
   );

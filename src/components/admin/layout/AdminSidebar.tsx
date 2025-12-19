@@ -13,7 +13,7 @@ import {
   Cross1Icon,
 } from '@radix-ui/react-icons';
 
-export default function MobileSidebar() {
+export default function AdminSidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const [openSections, setOpenSections] = useState<string[]>(['dashboard']);
 
