@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-  baseURL: 'https://api.malicc.store',
+  // baseURL: 'https://api.malicc.store',
+  baseURL: 'http://localhost:8000/graphql',
   headers: {
     'Content-Type': 'application/json',
   },
