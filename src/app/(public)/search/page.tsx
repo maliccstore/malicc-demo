@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useAppSelector } from '@/store/hooks';
 import ProductCard from '@/components/products/ProductCard';
 import { Box, Container, Flex, Heading, Text, Select, Grid, TextField } from '@radix-ui/themes';
 import { Search, Frown } from 'lucide-react';
 
-export default function SearchPage() {
+function SearchPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const query = searchParams.get('q') || '';
@@ -40,7 +40,7 @@ export default function SearchPage() {
   }, [query]);
 
   // Filter and Sort Logic (calculated on every render)
-  let filteredProducts = products.filter((product) =>
+  const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(query.toLowerCase())
   );
 
@@ -63,7 +63,7 @@ export default function SearchPage() {
               Search Results
             </Heading>
             <Text color="gray" size="2">
-              {filteredProducts.length} results for "{query}"
+              {filteredProducts.length} results for &quot;{query}&quot;
             </Text>
           </Box>
 
@@ -106,7 +106,7 @@ export default function SearchPage() {
         ) : (
           <Flex direction="column" align="center" justify="center" py="9" gap="4" className="bg-gray-50 rounded-lg border border-dashed border-gray-300">
             <Frown size={48} className="text-gray-400" />
-            <Heading size="4" color="gray">No results found for "{query}"</Heading>
+            <Heading size="4" color="gray">No results found for &quot;{query}&quot;</Heading>
             <Text color="gray" align="center" style={{ maxWidth: 400 }}>
               Try checking your spelling or use different keywords.
             </Text>
@@ -115,4 +115,12 @@ export default function SearchPage() {
       </Flex>
     </Container>
   );
-};
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SearchPageContent />
+    </Suspense>
+  );
+}
