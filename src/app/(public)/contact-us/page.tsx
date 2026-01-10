@@ -28,7 +28,7 @@ const ContactUsPage = () => {
     return (
         <div className="container mx-auto px-4 py-8 md:py-16 max-w-6xl text-gray-900 font-sans">
             <h1 className="text-3xl md:text-4xl font-bold text-center mb-8 uppercase tracking-wide border-b-2 border-transparent hover:border-black transition-all inline-block w-full">
-                Contact Us
+                Contact US
             </h1>
 
             <div className="grid grid-cols-1  gap-12 lg:gap-20">
