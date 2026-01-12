@@ -4,22 +4,60 @@ import { useRouter } from 'next/navigation';
 import { Button } from '../ui/Button';
 import { Product } from '@/types/product';
 import { Heading, Text, Card } from '@radix-ui/themes';
+import { Heart } from 'lucide-react';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/store';
+import { addToWishlist, removeFromWishlist } from '@/store/slices/wishlistSlice';
+import { useAuth } from '@/features/auth/hooks/useAuthActions';
+import { MouseEvent } from 'react';
+import toast from 'react-hot-toast';
 
 interface ProductCardProps {
   product: Product;
 }
 export default function ProductCard({ product }: ProductCardProps) {
   const router = useRouter();
+  const dispatch = useDispatch();
+  const { isAuthenticated } = useAuth();
+  const wishlistItems = useSelector((state: RootState) => state.wishlist.items);
+  const isInWishlist = wishlistItems.some((item) => item.id === product.id);
 
   const handleClick = () => {
     router.push(`/product/${product.id}`);
+  };
+
+  const handleWishlistClick = (e: MouseEvent) => {
+    e.stopPropagation();
+    if (!isAuthenticated) {
+      router.push('/auth/login');
+      return;
+    }
+
+    if (isInWishlist) {
+      dispatch(removeFromWishlist(product.id));
+      toast.success('Product removed from wishlist');
+    } else {
+      dispatch(addToWishlist(product));
+      toast.success('Product added to wishlist');
+    }
   };
   return (
     <Card
       onClick={handleClick}
       className="m-2 w-full max-w-xs overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
     >
+      {/* Wishlist Button */}
       <div className="relative aspect-square overflow-hidden">
+        <button
+          className="absolute top-2 right-2 z-20 p-2 bg-white/90 hover:bg-white transition-colors rounded-full shadow-md"
+          onClick={handleWishlistClick}
+          type="button"
+        >
+          <Heart
+            size={20}
+            className={isInWishlist ? 'fill-red-500 text-red-500' : 'text-gray-600'}
+          />
+        </button>
         <Image
           src={product.image}
           alt={product.name}
