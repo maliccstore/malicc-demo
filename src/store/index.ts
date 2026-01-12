@@ -7,6 +7,7 @@ import productReducer from './slices/productSlice';
 import adminProducts from './admin/product/productSlice';
 import adminOrders from './admin/order/orderSlice';
 import authReducer from './slices/authSlice';
+import wishlistReducer from './slices/wishlistSlice';
 import { loadState, saveState } from './cartPersist';
 const preloadedState = {
   cart: loadState() || undefined,
@@ -22,6 +23,7 @@ export const makeStore = () => {
       adminProducts: adminProducts,
       adminOrders: adminOrders,
       auth: authReducer,
+      wishlist: wishlistReducer,
       // Add other reducers here
     },
     preloadedState,

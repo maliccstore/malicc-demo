@@ -1,55 +1,27 @@
 "use client";
 
+
 import { Button, Card, Flex, Heading, Text } from "@radix-ui/themes";
 import { Trash2, ShoppingBag } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
-
-// Dummy data
-const INITIAL_WISHLIST = [
-    {
-        id: 1,
-        name: "Classic White T-Shirt",
-        price: "$29.00",
-        details: "100% Cotton, Size M",
-        inStock: true,
-    },
-    {
-        id: 2,
-        name: "Denim Jacket",
-        price: "$89.00",
-        details: "Light Wash, Vintage Fit",
-        inStock: true,
-    },
-    {
-        id: 3,
-        name: "Canvas Sneakers",
-        price: "$59.00",
-        details: "Black/White, Size 10",
-        inStock: false,
-    },
-    {
-        id: 4,
-        name: "Leather Wallet",
-        price: "$45.00",
-        details: "Genuine Leather, Brown",
-        inStock: true,
-    },
-];
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "@/store";
+import { removeFromWishlist } from "@/store/slices/wishlistSlice";
+import { addToCart } from "@/store/slices/cartSlice";
+import { Product } from "@/types/product";
+import Image from "next/image";
 
 export default function WishlistPage() {
-    const [items, setItems] = useState(INITIAL_WISHLIST);
-    // TODO: Get Wishlist from API
+    const dispatch = useDispatch();
+    const items = useSelector((state: RootState) => state.wishlist.items);
 
-    // TODO: Delete Wishlist from API
     const handleDelete = (id: number) => {
-        setItems(items.filter((item) => item.id !== id));
+        dispatch(removeFromWishlist(id));
     };
 
-    // TODO: Move to Bag from API
-    const moveToBag = (id: number) => {
-        // Placeholder for move to bag logic
-        console.log("Move to bag", id);
+    const moveToBag = (product: Product) => {
+        dispatch(addToCart(product));
+        dispatch(removeFromWishlist(product.id));
     };
 
     if (items.length === 0) {
@@ -76,7 +48,7 @@ export default function WishlistPage() {
     return (
         <div className="container mx-auto px-4 py-12 max-w-3xl">
             <Heading size="8" weight="light" mb="6">
-                Wishlist List
+                Wishlist
             </Heading>
 
             <Flex direction="column" gap="4">
@@ -84,7 +56,14 @@ export default function WishlistPage() {
                     <Card key={item.id} size="2">
                         <Flex align="start" gap="4">
                             {/* Image */}
-                            <div className="w-20 h-20 bg-gray-200 rounded-md flex-shrink-0" />
+                            <div className="relative w-24 h-24 flex-shrink-0 bg-gray-100 rounded-md overflow-hidden">
+                                <Image
+                                    src={item.image}
+                                    alt={item.name}
+                                    fill
+                                    className="object-cover"
+                                />
+                            </div>
 
                             {/* Content */}
                             <Flex direction="column" gap="1" flexGrow="1">
@@ -93,15 +72,18 @@ export default function WishlistPage() {
                                 </Heading>
 
                                 <Text size="2" color="gray">
-                                    {item.details}
+                                    {item.description}
+                                </Text>
+
+                                <Text size="2" weight="bold" mt="1">
+                                    ${item.price}
                                 </Text>
 
                                 <Button
                                     variant="ghost"
                                     size="2"
-                                    className="p-0 w-fit text-blue-600 hover:underline"
-                                    onClick={() => moveToBag(item.id)}
-                                    disabled={!item.inStock}
+                                    className="p-0 w-fit text-blue-600 hover:underline mt-2"
+                                    onClick={() => moveToBag(item)}
                                 >
                                     Move to Bag
                                 </Button>
@@ -122,5 +104,5 @@ export default function WishlistPage() {
             </Flex>
         </div>
     );
-
 }
+
