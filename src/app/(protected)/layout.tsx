@@ -1,6 +1,6 @@
 'use client';
 
-import { redirect } from 'next/navigation';
+import { redirect, usePathname } from 'next/navigation';
 import { useEffect } from 'react';
 import { useAuth } from '@/features/auth/hooks/useAuthActions';
 import Header from '@/components/common/Header';
@@ -13,12 +13,13 @@ export default function ProtectedLayout({
   children: React.ReactNode;
 }) {
   const { isAuthenticated, isLoading } = useAuth();
+  const pathname = usePathname();
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      redirect('/auth/login');
+      redirect(`/auth/login?returnUrl=${encodeURIComponent(pathname)}`);
     }
-  }, [isAuthenticated, isLoading]);
+  }, [isAuthenticated, isLoading, pathname]);
 
   return (
     <>
