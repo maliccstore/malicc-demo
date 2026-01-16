@@ -3,6 +3,9 @@
 import { redirect } from 'next/navigation';
 import { useEffect } from 'react';
 import { useAuth } from '@/features/auth/hooks/useAuthActions';
+import Header from '@/components/common/Header';
+import BottomNavigation from '@/components/common/BottomNavigation';
+import { Box, Container } from '@radix-ui/themes';
 
 export default function ProtectedLayout({
   children,
@@ -17,7 +20,21 @@ export default function ProtectedLayout({
     }
   }, [isAuthenticated, isLoading]);
 
-  if (isLoading) return <div>Loading...</div>;
-
-  return <>{children}</>;
+  return (
+    <>
+      <Header />
+      <Container className="p-4">
+        <Box>
+          {isLoading ? (
+            <div className="flex items-center justify-center min-h-[50vh]">
+              Loading...
+            </div>
+          ) : (
+            children
+          )}
+        </Box>
+      </Container>
+      <BottomNavigation />
+    </>
+  );
 }
