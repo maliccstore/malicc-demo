@@ -7,7 +7,7 @@ import '@radix-ui/themes/styles.css';
 import Header from '@/components/common/Header';
 import BottomNavigation from '@/components/common/BottomNavigation';
 
-import { Box, Container } from '@radix-ui/themes';
+import { Flex, Container } from '@radix-ui/themes';
 
 export const metadata: Metadata = {
   title: 'Malicc Store',
@@ -25,13 +25,14 @@ export default function PublicRootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <>
+    <Flex minHeight="100vh" direction="column">
       <Header />
 
-      <Container className="p-4">
-        <Box>{children}</Box>
+      <Container p="4" flexGrow="1">
+        {children}
       </Container>
+
       <BottomNavigation />
-    </>
+    </Flex>
   );
 }

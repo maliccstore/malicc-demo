@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 import { useAuth } from '@/features/auth/hooks/useAuthActions';
 import Header from '@/components/common/Header';
 import BottomNavigation from '@/components/common/BottomNavigation';
-import { Box, Container } from '@radix-ui/themes';
+import { Flex, Container } from '@radix-ui/themes';
 
 export default function ProtectedLayout({
   children,
@@ -22,20 +22,20 @@ export default function ProtectedLayout({
   }, [isAuthenticated, isLoading, pathname]);
 
   return (
-    <>
+    <Flex minHeight="100vh" direction="column">
       <Header />
-      <Container className="p-4">
-        <Box>
-          {isLoading ? (
-            <div className="flex items-center justify-center min-h-[50vh]">
-              Loading...
-            </div>
-          ) : (
-            children
-          )}
-        </Box>
+
+      <Container p="4" flexGrow="1">
+        {isLoading ? (
+          <Flex align="center" justify="center" height="full">
+            Loading...
+          </Flex>
+        ) : (
+          children
+        )}
       </Container>
+
       <BottomNavigation />
-    </>
+    </Flex>
   );
 }
