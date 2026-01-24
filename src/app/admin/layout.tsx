@@ -2,6 +2,7 @@
 
 import AdminHeader from '@/components/admin/layout/AdminHeader';
 import AdminSidebar from '@/components/admin/layout/AdminSidebar';
+import { Flex, Box } from '@radix-ui/themes';
 
 export default function AdminLayout({
   children,
@@ -9,10 +10,10 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <Flex direction="column" className="min-h-screen bg-gray-50">
       <AdminSidebar />
       <AdminHeader />
-      <main>{children}</main>
-    </div>
+      <Box p="4">{children}</Box>
+    </Flex>
   );
 }
