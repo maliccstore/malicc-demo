@@ -1,175 +1,104 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { orderAPI } from '@/services/orderAPI';
-import { Heading, Text, Card, Badge, Button } from '@radix-ui/themes';
-import { Package, MapPin, AlertCircle } from 'lucide-react';
+import { useEffect } from 'react';
+import { Heading, Text, Card, Badge, Button, Box, Flex } from '@radix-ui/themes';
+import { Package, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
-
-interface OrderItem {
-    id: string;
-    productName: string;
-    quantity: number;
-    unitPrice: number;
-    totalPrice: number;
-}
-
-interface Order {
-    id: string;
-    status: string;
-    totalAmount: number;
-    createdAt: string | number;
-    items: OrderItem[];
-    shippingAddress?: {
-        addressLine1: string;
-        city: string;
-        state: string;
-    };
-}
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { fetchMyOrders } from '@/store/slices/orderSlice';
 
 export default function OrdersPage() {
-    const [orders, setOrders] = useState<Order[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
+    const dispatch = useAppDispatch();
+    const { orders, loading, error } = useAppSelector((state) => state.orders);
 
     useEffect(() => {
-        const fetchOrders = async () => {
-            try {
-                const response = await orderAPI.myOrders();
-                if (response.success) {
-                    setOrders(response.orders);
-                } else {
-                    setError(response.message || 'Failed to load orders');
-                }
-            } catch (err: unknown) {
-                const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
-                setError(errorMessage);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchOrders();
-    }, []);
+        dispatch(fetchMyOrders());
+    }, [dispatch]);
 
     if (loading) {
         return (
-            <div className="flex h-[50vh] items-center justify-center">
-                <div className="flex flex-col items-center gap-2">
+            <Flex align="center" justify="center" className="h-[50vh]">
+                <Flex direction="column" align="center" gap="2">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
                     <Text color="gray">Loading orders...</Text>
-                </div>
-            </div>
+                </Flex>
+            </Flex>
         );
     }
 
     if (error) {
         return (
-            <div className="max-w-4xl mx-auto p-4 md:p-8">
-                <div className="bg-red-50 border border-red-200 text-red-600 p-4 rounded-lg flex items-center gap-2">
+            <Box className="max-w-5xl mx-auto p-4">
+                <Flex className="bg-red-50 border border-red-200 text-red-600 p-4 rounded-lg items-center gap-2">
                     <AlertCircle size={20} />
                     <Text>{error}</Text>
-                </div>
-            </div>
+                </Flex>
+            </Box>
         )
     }
 
     return (
-        <div className="max-w-5xl mx-auto p-4 md:p-8">
-            <div className="flex items-center gap-3 mb-8">
-                <Package size={32} className="text-gray-900" />
+        <Box className="max-w-5xl mx-auto">
+            <Flex align="center" gap="3" className="mb-8">
+                <Package size={32} />
                 <Heading size="8" className="font-bold tracking-tight">My Orders</Heading>
-            </div>
+            </Flex>
 
             {orders.length === 0 ? (
-                <div className="text-center py-16 bg-gray-50 rounded-lg border border-gray-200 border-dashed">
-                    <Package className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                <Flex direction="column" align="center" className="py-16 bg-gray-50 rounded-lg border border-gray-200 border-dashed">
+                    <Box className="mb-4 text-gray-400">
+                        <Package size={48} />
+                    </Box>
                     <Heading size="4" className="mb-2 text-gray-900">No orders yet</Heading>
                     <Text className="text-gray-500 mb-6 block">Looks like you haven&apos;t placed any orders yet.</Text>
                     <Link href="/explore">
                         <Button size="3" variant="solid" className="cursor-pointer">Start Shopping</Button>
                     </Link>
-                </div>
+                </Flex>
             ) : (
-                <div className="space-y-6">
+                <Flex direction="column" gap="4">
                     {orders.map((order) => (
-                        <Card key={order.id} className="p-0 overflow-hidden border-0 shadow-sm ring-1 ring-gray-200">
-                            {/* Header */}
-                            <div className="bg-gray-50 px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-100">
-                                <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-gray-600">
-                                    <div className="flex flex-col">
-                                        <span className="text-xs uppercase font-medium text-gray-500">Order Placed</span>
-                                        <span className="font-medium text-gray-900">{new Date(Number(order.createdAt)).toLocaleDateString()}</span>
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-xs uppercase font-medium text-gray-500">Total</span>
-                                        <span className="font-medium text-gray-900">${order.totalAmount}</span>
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-xs uppercase font-medium text-gray-500">Order #</span>
-                                        <span className="font-mono text-gray-900">{order.id}</span>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-4">
-                                    <Badge color={getStatusColor(order.status)} size="1" variant="solid" radius="full" className="px-3">
-                                        {order.status}
-                                    </Badge>
-                                    {/* Placeholder for details link */}
-                                    <Link href={`/orders/${order.id}`}>
-                                        <Button variant="ghost" size="1" className="text-blue-600 hover:text-blue-700 font-medium">
-                                            View Details
-                                        </Button>
-                                    </Link>
-                                </div>
-                            </div>
+                        <Link key={order.id} href={`/orders/${order.id}`} className="block">
+                            <Card className="hover:shadow-md transition-shadow cursor-pointer shadow-sm p-0 overflow-hidden">
+                                <Flex direction={{ initial: 'column', sm: 'row' }} justify="between" gap="4" className="p-2 sm:p-4">
+                                    <Flex direction="column" gap="1" className="w-full sm:w-auto">
+                                        <Text size="2">Order <Text color="gray">#{order.id.slice(0, 9)}...</Text></Text>
+                                        <Flex gap={{ initial: '4', sm: '1' }} direction={{ initial: 'row', sm: 'column' }}>
+                                            <Text size="2" color="gray">Items: <Text weight="bold">{order.items.length}</Text></Text>
+                                            <Text size="2" color="gray">Total: <Text weight="bold">${order.totalAmount}</Text></Text>
+                                        </Flex>
+                                    </Flex>
 
-                            {/* Body */}
-                            <div className="p-6">
-                                <div className="flex flex-col gap-6">
-                                    {/* Items */}
-                                    <div className="space-y-4">
-                                        {order.items.map((item: OrderItem) => (
-                                            <div key={item.id} className="flex items-start justify-between">
-                                                <div className="flex gap-4">
-                                                    <div className="h-16 w-16 bg-gray-100 rounded-md flex-shrink-0 flex items-center justify-center">
-                                                        <Package size={24} className="text-gray-400" />
-                                                    </div>
-                                                    <div>
-                                                        <Text weight="medium" className="block text-gray-900">{item.productName}</Text>
-                                                        <Text size="2" color="gray">Qty: {item.quantity}</Text>
-                                                    </div>
-                                                </div>
-                                                <Text weight="medium">${item.totalPrice}</Text>
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                    {/* Address Preview */}
-                                    {order.shippingAddress && (
-                                        <div className="mt-4 pt-4 border-t border-gray-100 flex items-start gap-2 text-sm text-gray-500">
-                                            <MapPin size={16} className="mt-0.5 flex-shrink-0" />
-                                            <span>
-                                                Delivery to {order.shippingAddress.city}, {order.shippingAddress.state}
-                                            </span>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        </Card>
+                                    <Flex direction={{ initial: 'row', sm: 'column' }} justify="between" align={{ initial: 'center', sm: 'end' }} gap={{ initial: '2', sm: '4' }} className="w-full sm:w-auto mt-2 sm:mt-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-100">
+                                        <Badge color={getStatusColor(order.status)} size="1" variant="solid" radius="full">
+                                            {order.status}
+                                        </Badge>
+                                        <Text size="2" color="gray" className="text-right">
+                                            {new Date(order.createdAt).toLocaleDateString('en-US', {
+                                                year: 'numeric',
+                                                month: 'short',
+                                                day: '2-digit'
+                                            })}
+                                        </Text>
+                                    </Flex>
+                                </Flex>
+                            </Card>
+                        </Link>
                     ))}
-                </div>
+                </Flex>
             )}
-        </div>
+        </Box>
     );
 }
 
 function getStatusColor(status: string) {
     switch (status) {
-        case 'CREATED': return 'blue';
-        case 'PROCESSING': return 'orange';
-        case 'SHIPPED': return 'indigo';
-        case 'DELIVERED': return 'green';
+        case 'CREATED': return 'gray';
+        case 'PAYMENT_PENDING': return 'orange';
+        case 'PAID': return 'blue';
+        case 'FULFILLED': return 'green';
         case 'CANCELLED': return 'red';
+        case 'FAILED': return 'red';
         default: return 'gray';
     }
 }

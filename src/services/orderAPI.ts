@@ -72,4 +72,61 @@ export const orderAPI = {
       throw error;
     }
   },
+
+  getOrder: async (id: string) => {
+    const query = `
+      query Order($id: String!) {
+        order(id: $id) {
+          success
+          message
+          order {
+            id
+            status
+            subtotal
+            tax
+            shippingFee
+            totalAmount
+            currency
+            paymentMethod
+            shippingMethod
+            createdAt
+            updatedAt
+            items {
+              id
+              productName
+              productId
+              quantity
+              unitPrice
+              totalPrice
+            }
+            shippingAddress {
+              fullName
+              phoneNumber
+              addressLine1
+              addressLine2
+              city
+              state
+              postalCode
+              country
+            }
+          }
+        }
+      }
+    `;
+
+    try {
+      const response = await apiClient.post("", {
+        query,
+        variables: { id },
+      });
+
+      if (response.data.errors) {
+        throw new Error(response.data.errors[0].message);
+      }
+
+      return response.data.data.order;
+    } catch (error) {
+      throw error;
+    }
+  },
 };
