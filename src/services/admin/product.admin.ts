@@ -208,7 +208,48 @@ export const adminProductAPI = {
     const resData = response.data.data.updateProduct;
     if (!resData.success) throw new Error(resData.message);
 
-    return { data: mapProductFromGQL(resData.product) };
+    const updatedProduct = resData.product;
+
+    if (data.inventory?.quantity !== undefined) {
+      try {
+        const inventoryQuery = `
+          mutation UpdateInventory($productId: String!, $quantity: Int!) {
+            updateInventory(productId: $productId, quantity: $quantity) {
+              id
+              quantity
+              availableQuantity
+            }
+          }
+        `;
+
+        // Ensure quantity is an integer
+        const quantityInt = Math.floor(data.inventory.quantity);
+
+        const invResponse = await apiClient.post('', {
+          query: inventoryQuery,
+          variables: {
+            productId: updatedProduct.id,
+            quantity: quantityInt
+          }
+        });
+
+        if (invResponse.data.errors) {
+          console.error('Failed to update inventory:', invResponse.data.errors);
+        } else {
+          const invData = invResponse.data.data.updateInventory;
+          if (invData) {
+            updatedProduct.inventory = {
+              quantity: invData.quantity,
+              availableQuantity: invData.availableQuantity
+            };
+          }
+        }
+      } catch (error) {
+        console.error('Failed to update inventory:', error);
+      }
+    }
+
+    return { data: mapProductFromGQL(updatedProduct) };
   },
 
   disable: async (id: string) => {
