@@ -49,7 +49,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     >
       {/* Wishlist Button */}
       <div className="relative aspect-square overflow-hidden bg-gray-100 flex items-center justify-center">
-        <button
+        <Button
           className="absolute top-2 right-2 z-20 p-2 bg-white/90 hover:bg-white transition-colors rounded-full shadow-md"
           onClick={handleWishlistClick}
           type="button"
@@ -58,7 +58,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             size={20}
             className={isInWishlist ? 'fill-red-500 text-red-500' : 'text-gray-600'}
           />
-        </button>
+        </Button>
         {product.image ? (
           <Image
             src={product.image}
@@ -76,12 +76,12 @@ export default function ProductCard({ product }: ProductCardProps) {
           <Heading as="h3" size="4" className="font-bold line-clamp-1">
             {product.name}
           </Heading>
-          <Text as="p" size="2" className="text-gray-600 line-clamp-2">
+          <Text as="p" size="2" color="gray">
             {product.description}
           </Text>
         </div>
         <div className="flex items-center justify-between">
-          <Text as="span" size="4" className="font-bold text-gray-900">
+          <Text as="span" size="4" >
             ${product.price}
           </Text>
           <Button
