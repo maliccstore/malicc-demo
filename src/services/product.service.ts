@@ -1,13 +1,13 @@
 import apiClient from './apiClient';
-import { Product } from '@/types/product';
+import { Product, ProductFilterInput } from '@/types/product';
 import axios from 'axios';
 
 export const productService = {
-    fetchProducts: async (): Promise<Product[]> => {
+    fetchProducts: async (filters?: ProductFilterInput): Promise<Product[]> => {
         try {
             const query = `
-        query GetProducts {
-          products {
+        query GetProducts($filters: ProductFilterInput) {
+          products(filters: $filters) {
             success
             message
             products {
@@ -30,6 +30,7 @@ export const productService = {
             // Authorization header is handled by apiClient interceptor
             const response = await apiClient.post('', {
                 query,
+                variables: { filters },
             }, {
                 timeout: 10000,
             });

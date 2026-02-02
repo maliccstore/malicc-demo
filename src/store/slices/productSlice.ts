@@ -1,6 +1,6 @@
 // productsSlice.ts
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
-import { Product } from '@/types/product';
+import { Product, ProductFilterInput } from '@/types/product';
 import { productService } from '@/services/product.service';
 
 interface ProductsState {
@@ -18,9 +18,9 @@ const initialState: ProductsState = {
 // Async thunk for fetching products
 export const fetchProducts = createAsyncThunk(
   'products/fetchProducts',
-  async (_, { rejectWithValue }) => {
+  async (filters: ProductFilterInput | undefined, { rejectWithValue }) => {
     try {
-      const products = await productService.fetchProducts();
+      const products = await productService.fetchProducts(filters);
       return products;
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to fetch products';
