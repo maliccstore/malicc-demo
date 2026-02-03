@@ -15,7 +15,7 @@ export default function WishlistPage() {
     const dispatch = useDispatch();
     const items = useSelector((state: RootState) => state.wishlist.items);
 
-    const handleDelete = (id: number) => {
+    const handleDelete = (id: string) => {
         dispatch(removeFromWishlist(id));
     };
 

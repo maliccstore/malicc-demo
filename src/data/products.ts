@@ -2,7 +2,7 @@ import { Product } from '@/types/product';
 
 const products: Product[] = [
   {
-    id: 1,
+    id: '1',
     name: 'Wireless Bluetooth Headphones',
     description: 'Dumy Description',
     image: 'https://picsum.photos/id/1084/200/300',
@@ -13,7 +13,7 @@ const products: Product[] = [
     createdAt: '2023-01-01',
   },
   {
-    id: 2,
+    id: '2',
     name: 'Smart Fitness Tracker Watch',
     description: 'Dumy Description',
     image: 'https://picsum.photos/id/367/200/300',
@@ -24,7 +24,7 @@ const products: Product[] = [
     createdAt: '2023-02-15',
   },
   {
-    id: 3,
+    id: '3',
     name: '4K Ultra HD Smart TV',
     description: 'Dumy Description',
     image: 'https://picsum.photos/id/160/200/300',
@@ -35,7 +35,7 @@ const products: Product[] = [
     createdAt: '2023-03-10',
   },
   {
-    id: 4,
+    id: '4',
     name: 'Stainless Steel Electric Kettle',
     description: 'Dumy Description',
     image: 'https://picsum.photos/id/431/200/300',
@@ -46,7 +46,7 @@ const products: Product[] = [
     createdAt: '2023-04-05',
   },
   {
-    id: 5,
+    id: '5',
     name: 'Wireless Ergonomic Mouse',
     description: 'Dumy Description',
     image: 'https://picsum.photos/id/219/200/300',

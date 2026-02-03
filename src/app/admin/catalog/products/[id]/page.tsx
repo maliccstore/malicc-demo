@@ -33,10 +33,9 @@ export default function EditProductPage({
     }
   }, [id, dispatch]);
 
-  if (!product) return <div>Loading…</div>;
-
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const productFormProps = useProductForm(product);
+
+  if (!product) return <div>Loading…</div>;
 
   return (
     <ProductForm

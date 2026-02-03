@@ -3,93 +3,86 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Box, Button, Checkbox, Flex, Heading, Select, Text, TextField, Grid } from '@radix-ui/themes';
+import { categoryService } from '@/services/category.service';
+import { Category } from '@/types/category';
 
-export default function FilterSort() {
+interface FilterSortProps {
+    onApply?: () => void;
+}
+
+export default function FilterSort(props: FilterSortProps) {
     return (
         <Suspense fallback={<Box>Loading filters...</Box>}>
-            <FilterSortContent />
+            <FilterSortContent {...props} />
         </Suspense>
     );
 }
 
-function FilterSortContent() {
+function FilterSortContent({ onApply }: FilterSortProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const q = searchParams.get('q');
 
-    // Derived state from URL for instant updates
-    const category = searchParams.get('category') || 'all';
-    const inStock = searchParams.get('inStock') === 'true';
-    const sort = searchParams.get('sort') || 'relevance';
+    const [categories, setCategories] = useState<Category[]>([]);
 
-    // Local state for debounced inputs
+    // Local state for all filters
+    const [category, setCategory] = useState(searchParams.get('category') || 'all');
+    const [inStock, setInStock] = useState(searchParams.get('inStock') === 'true');
+    const [sort, setSort] = useState(searchParams.get('sort') || 'relevance');
     const [minPrice, setMinPrice] = useState(searchParams.get('minPrice') || '');
     const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') || '');
 
-    // Sync local price state with URL if URL changes (e.g. clear filters or back button)
-    // We check if the values differ significantly to avoid interrupting typing if possible,
-    // but simpler to just sync when params change.
     useEffect(() => {
-        const urlMin = searchParams.get('minPrice') || '';
-        const urlMax = searchParams.get('maxPrice') || '';
-        if (urlMin !== minPrice) setMinPrice(urlMin);
-        if (urlMax !== maxPrice) setMaxPrice(urlMax);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        const loadCategories = async () => {
+            const data = await categoryService.getAll({ isActive: true });
+            setCategories(data);
+        };
+        loadCategories();
+    }, []);
+
+    // Sync state with URL when URL changes (e.g. navigation / back button)
+    useEffect(() => {
+        setCategory(searchParams.get('category') || 'all');
+        setInStock(searchParams.get('inStock') === 'true');
+        setSort(searchParams.get('sort') || 'relevance');
+        setMinPrice(searchParams.get('minPrice') || '');
+        setMaxPrice(searchParams.get('maxPrice') || '');
     }, [searchParams]);
 
-    // Debounce price updates
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            const currentMin = searchParams.get('minPrice') || '';
-            const currentMax = searchParams.get('maxPrice') || '';
-
-            // Only update if changed to avoid redundant pushes
-            if (minPrice !== currentMin || maxPrice !== currentMax) {
-                updateParams({ minPrice, maxPrice });
-            }
-        }, 500);
-        return () => clearTimeout(timer);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [minPrice, maxPrice]);
-
-    const updateParams = (updates: Record<string, string | boolean | null>) => {
+    const handleApply = () => {
         const params = new URLSearchParams(searchParams.toString());
 
-        Object.entries(updates).forEach(([key, value]) => {
+        // Helper to set/delete
+        const setParam = (key: string, value: string | null) => {
             if (value === null || value === '' || value === 'all') {
                 params.delete(key);
             } else {
-                params.set(key, String(value));
+                params.set(key, value);
             }
-        });
+        };
+
+        setParam('category', category);
+        setParam('inStock', inStock ? 'true' : null);
+        setParam('sort', sort);
+        setParam('minPrice', minPrice);
+        setParam('maxPrice', maxPrice);
 
         router.push(`?${params.toString()}`, { scroll: false });
+
+        if (onApply) {
+            onApply();
+        }
     };
 
     const clearFilters = () => {
+        setCategory('all');
+        setInStock(false);
+        setSort('relevance');
         setMinPrice('');
         setMaxPrice('');
-        // Create new params preserving 'q'
-        const newParams = new URLSearchParams();
-        if (q) newParams.set('q', q);
-
-        router.push(`?${newParams.toString()}`, { scroll: false });
-    };
-
-    const handleCategoryChange = (val: string) => {
-        updateParams({ category: val });
-    };
-
-    const handleInStockChange = (checked: boolean) => {
-        updateParams({ inStock: checked ? 'true' : null });
-    };
-
-    const handleSortChange = (val: string) => {
-        updateParams({ sort: val });
     };
 
     return (
-        <Box className="w-full mb-6 border-b pb-6">
+        <Box>
             <Flex justify="between" align="center" mb="4">
                 <Heading size="3">Filters</Heading>
                 <Button variant="ghost" size="1" onClick={clearFilters}>Clear</Button>
@@ -99,7 +92,7 @@ function FilterSortContent() {
                 {/* Sorting */}
                 <Box>
                     <Text size="2" weight="bold" mb="2" as="div">Sort By</Text>
-                    <Select.Root value={sort} onValueChange={handleSortChange}>
+                    <Select.Root value={sort} onValueChange={setSort}>
                         <Select.Trigger className="w-full" placeholder="Sort by..." />
                         <Select.Content>
                             <Select.Item value="relevance">Relevance</Select.Item>
@@ -114,14 +107,15 @@ function FilterSortContent() {
                 {/* Category Filter */}
                 <Box>
                     <Text size="2" weight="bold" mb="2" as="div">Category</Text>
-                    <Select.Root value={category} onValueChange={handleCategoryChange}>
+                    <Select.Root value={category} onValueChange={setCategory}>
                         <Select.Trigger className="w-full" placeholder="Select Category" />
                         <Select.Content>
                             <Select.Item value="all">All Categories</Select.Item>
-                            <Select.Item value="Electronics">Electronics</Select.Item>
-                            <Select.Item value="Fitness">Fitness</Select.Item>
-                            <Select.Item value="Home">Home</Select.Item>
-                            <Select.Item value="Accessories">Accessories</Select.Item>
+                            {categories.map((cat) => (
+                                <Select.Item key={cat.id} value={cat.id}>
+                                    {cat.name}
+                                </Select.Item>
+                            ))}
                         </Select.Content>
                     </Select.Root>
                 </Box>
@@ -151,12 +145,18 @@ function FilterSortContent() {
                         <Flex gap="2" align="center">
                             <Checkbox
                                 checked={inStock}
-                                onCheckedChange={handleInStockChange}
+                                onCheckedChange={(checked) => setInStock(!!checked)}
                             />
                             In Stock Only
                         </Flex>
                     </Text>
                 </Box>
+
+                {/* Apply Button */}
+                <Button size="3" variant="solid" onClick={handleApply} className="w-full mt-4">
+                    Show Results
+                </Button>
+
             </Grid>
         </Box>
     );

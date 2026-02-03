@@ -41,7 +41,7 @@ export function useProductForm(product?: AdminProduct) {
         watch,
         formState: { errors, isSubmitting },
     } = useForm<ProductFormValues>({
-        defaultValues: {
+        values: {
             title: product?.name || '',
             description: product?.description || '',
             imageUrl: product?.images?.[0] || '',
