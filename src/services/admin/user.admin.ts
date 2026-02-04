@@ -1,37 +1,42 @@
-import apiClient from '@/services/apiClient';
 import { AdminUser } from '@/features/admin/users/users.types';
+import { demoUser } from '@/data/users';
 
-// Helper to map backend response to frontend types
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const mapUserFromGQL = (u: any): AdminUser => ({
-  id: u.id,
-  username: u.username,
-  phoneNumber: u.phoneNumber,
-  isPhoneVerified: u.isPhoneVerified,
-  role: u.role,
-  email: u.email,
-  createdAt: u.createdAt,
-  updatedAt: u.updatedAt,
-});
+// Maintain local state
+// Adding a few extra fake users for list view
+const adminUsers: AdminUser[] = [
+  {
+    ...demoUser,
+    isPhoneVerified: true, // Ensuring type compatibility if needed
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: 'user-demo-2',
+    username: 'John Doe',
+    email: 'john@example.com',
+    phoneNumber: '9988776655',
+    role: 'USER',
+    isAdmin: false,
+    isPhoneVerified: true,
+    createdAt: new Date(Date.now() - 100000000).toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: 'user-demo-3',
+    username: 'Alice Smith',
+    email: 'alice@test.com',
+    phoneNumber: '1122334455',
+    role: 'USER',
+    isAdmin: false,
+    isPhoneVerified: false,
+    createdAt: new Date(Date.now() - 200000000).toISOString(),
+    updatedAt: new Date().toISOString()
+  }
+];
 
 export const adminUserAPI = {
   getAll: async () => {
-    const query = `
-      query GetAllUsers {
-        users {
-          id
-          username
-          phoneNumber
-          isPhoneVerified
-          role
-          email
-          createdAt
-          updatedAt
-        }
-      }
-    `;
-    const response = await apiClient.post('', { query });
-    if (response.data.errors) throw new Error(response.data.errors[0].message);
-    return { data: response.data.data.users.map(mapUserFromGQL) };
+    await new Promise(resolve => setTimeout(resolve, 600));
+    return { data: adminUsers };
   },
 };
