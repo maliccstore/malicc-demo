@@ -1,285 +1,96 @@
-import apiClient from '@/services/apiClient';
 import { AdminProduct } from '@/features/admin/products/product.types';
+import { demoProducts } from '@/data/products';
+import { Product } from '@/types/product';
 
-// Helper to map backend response to frontend types
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const mapProductFromGQL = (p: any): AdminProduct => ({
+// Helper to map generic demo Product to AdminProduct
+const mapProductToAdmin = (p: Product): AdminProduct => ({
   id: p.id,
   name: p.name,
   description: p.description,
   price: p.price,
-  status: p.isActive ? 'ACTIVE' : 'INACTIVE',
+  status: p.inStock ? 'ACTIVE' : 'INACTIVE', // Mapping inStock to status for demo
   category: p.category,
-  sku: p.sku,
-  images: p.imageUrl || [],
-  inventory: p.inventory ? {
-    quantity: p.inventory.quantity,
-    availableQuantity: p.inventory.availableQuantity
-  } : {
-    quantity: 0,
-    availableQuantity: 0
+  sku: `SKU-${p.id}`,
+  images: p.image ? [p.image] : [],
+  inventory: {
+    quantity: p.inStock ? 50 : 0,
+    availableQuantity: p.inStock ? 50 : 0
   },
   createdAt: p.createdAt,
-  updatedAt: p.updatedAt,
+  updatedAt: p.createdAt,
 });
+
+// Maintain a local state for admin edits
+let adminProducts = demoProducts.map(mapProductToAdmin);
 
 export const adminProductAPI = {
   getAll: async () => {
-    const query = `
-      query GetAllProducts {
-        products {
-          products {
-            id
-            name
-            description
-            price
-            category
-            imageUrl
-            isActive
-            sku
-            createdAt
-            updatedAt
-            inventory {
-              quantity
-              availableQuantity
-            }
-          }
-        }
-      }
-    `;
-    const response = await apiClient.post('', { query });
-    if (response.data.errors) throw new Error(response.data.errors[0].message);
-    return { data: response.data.data.products.products.map(mapProductFromGQL) };
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return { data: adminProducts };
   },
 
   getById: async (id: string) => {
-    const query = `
-      query GetProduct($id: String!) {
-        product(id: $id) {
-          product {
-            id
-            name
-            description
-            price
-            category
-            imageUrl
-            isActive
-            sku
-            createdAt
-            updatedAt
-            inventory {
-              quantity
-              availableQuantity
-            }
-          }
-        }
-      }
-    `;
-    const response = await apiClient.post('', { query, variables: { id } });
-    if (response.data.errors) throw new Error(response.data.errors[0].message);
-    return { data: mapProductFromGQL(response.data.data.product.product) };
+    await new Promise(resolve => setTimeout(resolve, 300));
+    const product = adminProducts.find(p => p.id === id);
+    if (!product) throw new Error("Product not found");
+    return { data: product };
   },
 
   create: async (data: Partial<AdminProduct>) => {
-    const query = `
-      mutation CreateProduct($input: CreateProductInput!) {
-        createProduct(input: $input) {
-          success
-          message
-          product {
-            id
-            name
-            description
-            price
-            category
-            imageUrl
-            isActive
-            sku
-            createdAt
-            updatedAt
-            inventory {
-              quantity
-              availableQuantity
-            }
-          }
-        }
-      }
-    `;
+    await new Promise(resolve => setTimeout(resolve, 800));
 
-    const input = {
-      name: data.name,
+    const newProduct: AdminProduct = {
+      id: `prod-${Date.now()}`,
+      name: data.name || 'New Product',
       description: data.description || '',
-      price: data.price,
-      category: data.category,
-      imageUrl: data.images || [],
-      isActive: data.status === 'ACTIVE',
-      sku: data.sku,
+      price: data.price || 0,
+      category: data.category || '',
+      sku: data.sku || `SKU-${Date.now()}`,
+      status: data.status || 'INACTIVE',
+      images: data.images || [],
+      inventory: data.inventory || { quantity: 0, availableQuantity: 0 },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     };
 
-    const response = await apiClient.post('', { query, variables: { input } });
-    if (response.data.errors) throw new Error(response.data.errors[0].message);
-
-    const resData = response.data.data.createProduct;
-    if (!resData.success) throw new Error(resData.message);
-
-    const createdProduct = resData.product;
-
-    if (data.inventory?.quantity && data.inventory.quantity > 0) {
-      try {
-        const inventoryQuery = `
-          mutation UpdateInventory($productId: String!, $quantity: Int!) {
-            updateInventory(productId: $productId, quantity: $quantity) {
-              id
-              quantity
-              availableQuantity
-            }
-          }
-        `;
-
-        // Ensure quantity is an integer
-        const quantityInt = Math.floor(data.inventory.quantity);
-
-        const invResponse = await apiClient.post('', {
-          query: inventoryQuery,
-          variables: {
-            productId: createdProduct.id,
-            quantity: quantityInt
-          }
-        });
-
-        if (invResponse.data.errors) {
-          console.error('Failed to update initial inventory:', invResponse.data.errors);
-        } else {
-          const invData = invResponse.data.data.updateInventory;
-          if (invData) {
-            createdProduct.inventory = {
-              quantity: invData.quantity,
-              availableQuantity: invData.availableQuantity
-            };
-          }
-        }
-      } catch (error) {
-        console.error('Failed to update initial inventory:', error);
-      }
-    }
-
-    return { data: mapProductFromGQL(createdProduct) };
+    adminProducts.push(newProduct);
+    return { data: newProduct };
   },
 
   update: async (id: string, data: Partial<AdminProduct>) => {
-    const query = `
-      mutation UpdateProduct($id: String!, $input: UpdateProductInput!) {
-        updateProduct(id: $id, input: $input) {
-          success
-          message
-          product {
-            id
-            name
-            description
-            price
-            category
-            imageUrl
-            isActive
-            sku
-            createdAt
-            updatedAt
-            inventory {
-              quantity
-              availableQuantity
-            }
-          }
-        }
-      }
-    `;
+    await new Promise(resolve => setTimeout(resolve, 800));
+    const index = adminProducts.findIndex(p => p.id === id);
+    if (index === -1) throw new Error("Product not found");
 
-    const input = {
-      name: data.name,
-      description: data.description,
-      price: data.price,
-      category: data.category,
-      imageUrl: data.images,
-      isActive: data.status ? data.status === 'ACTIVE' : undefined,
-      sku: data.sku,
+    adminProducts[index] = {
+      ...adminProducts[index],
+      ...data,
+      updatedAt: new Date().toISOString(),
+      // Simple merge for inventory if present
+      inventory: data.inventory ? { ...adminProducts[index].inventory, ...data.inventory } : adminProducts[index].inventory
     };
 
-    const response = await apiClient.post('', { query, variables: { id, input } });
-    if (response.data.errors) throw new Error(response.data.errors[0].message);
-
-    const resData = response.data.data.updateProduct;
-    if (!resData.success) throw new Error(resData.message);
-
-    const updatedProduct = resData.product;
-
-    if (data.inventory?.quantity !== undefined) {
-      try {
-        const inventoryQuery = `
-          mutation UpdateInventory($productId: String!, $quantity: Int!) {
-            updateInventory(productId: $productId, quantity: $quantity) {
-              id
-              quantity
-              availableQuantity
-            }
-          }
-        `;
-
-        // Ensure quantity is an integer
-        const quantityInt = Math.floor(data.inventory.quantity);
-
-        const invResponse = await apiClient.post('', {
-          query: inventoryQuery,
-          variables: {
-            productId: updatedProduct.id,
-            quantity: quantityInt
-          }
-        });
-
-        if (invResponse.data.errors) {
-          console.error('Failed to update inventory:', invResponse.data.errors);
-        } else {
-          const invData = invResponse.data.data.updateInventory;
-          if (invData) {
-            updatedProduct.inventory = {
-              quantity: invData.quantity,
-              availableQuantity: invData.availableQuantity
-            };
-          }
-        }
-      } catch (error) {
-        console.error('Failed to update inventory:', error);
-      }
-    }
-
-    return { data: mapProductFromGQL(updatedProduct) };
+    return { data: adminProducts[index] };
   },
 
   disable: async (id: string) => {
-    const query = `
-      mutation ToggleStatus($id: String!) {
-        toggleProductStatus(id: $id) {
-          product {
-            isActive
-          }
-        }
-      }
-    `;
-    const response = await apiClient.post('', { query, variables: { id } });
-    if (response.data.errors) throw new Error(response.data.errors[0].message);
-    return { data: response.data.data.toggleProductStatus };
+    await new Promise(resolve => setTimeout(resolve, 400));
+    const index = adminProducts.findIndex(p => p.id === id);
+    if (index === -1) throw new Error("Product not found");
+
+    const newStatus = adminProducts[index].status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+    adminProducts[index] = { ...adminProducts[index], status: newStatus };
+
+    return { data: { isActive: newStatus === 'ACTIVE' } };
   },
 
   delete: async (id: string) => {
-    const query = `
-      mutation DeleteProduct($id: String!) {
-        deleteProduct(id: $id) {
-          success
-          message
-        }
-      }
-    `;
-    const response = await apiClient.post('', { query, variables: { id } });
-    if (response.data.errors) throw new Error(response.data.errors[0].message);
-    const resData = response.data.data.deleteProduct;
-    if (!resData.success) throw new Error(resData.message);
-    return { data: resData };
+    await new Promise(resolve => setTimeout(resolve, 600));
+    const initialLen = adminProducts.length;
+    adminProducts = adminProducts.filter(p => p.id !== id);
+
+    if (adminProducts.length === initialLen) throw new Error("Product not found");
+
+    return { data: { success: true, message: "Product deleted" } };
   },
 };
