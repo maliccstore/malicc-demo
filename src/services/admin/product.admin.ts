@@ -3,6 +3,7 @@ import { demoProducts } from '@/data/products';
 import { Product } from '@/types/product';
 
 // Helper to map generic demo Product to AdminProduct
+// Helper to map generic demo Product to AdminProduct
 const mapProductToAdmin = (p: Product): AdminProduct => ({
   id: p.id,
   name: p.name,
@@ -20,18 +21,37 @@ const mapProductToAdmin = (p: Product): AdminProduct => ({
   updatedAt: p.createdAt,
 });
 
-// Maintain a local state for admin edits
-let adminProducts = demoProducts.map(mapProductToAdmin);
+const STORAGE_KEY = 'MALICC_DEMO_PRODUCTS';
+
+const getStoredProducts = (): AdminProduct[] => {
+  if (typeof window === 'undefined') return [];
+
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (stored) {
+    return JSON.parse(stored);
+  }
+
+  // Initialize with demo data if empty
+  const initial = demoProducts.map(mapProductToAdmin);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
+  return initial;
+};
+
+const saveStoredProducts = (products: AdminProduct[]) => {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+};
 
 export const adminProductAPI = {
   getAll: async () => {
     await new Promise(resolve => setTimeout(resolve, 500));
-    return { data: [...adminProducts] };
+    return { data: getStoredProducts() };
   },
 
   getById: async (id: string) => {
     await new Promise(resolve => setTimeout(resolve, 300));
-    const product = adminProducts.find(p => p.id === id);
+    const products = getStoredProducts();
+    const product = products.find(p => p.id === id);
     if (!product) throw new Error("Product not found");
     return { data: product };
   },
@@ -53,44 +73,53 @@ export const adminProductAPI = {
       updatedAt: new Date().toISOString()
     };
 
-    adminProducts.push(newProduct);
+    const products = getStoredProducts();
+    products.push(newProduct);
+    saveStoredProducts(products);
+
     return { data: newProduct };
   },
 
   update: async (id: string, data: Partial<AdminProduct>) => {
     await new Promise(resolve => setTimeout(resolve, 800));
-    const index = adminProducts.findIndex(p => p.id === id);
+    const products = getStoredProducts();
+    const index = products.findIndex(p => p.id === id);
     if (index === -1) throw new Error("Product not found");
 
-    adminProducts[index] = {
-      ...adminProducts[index],
+    products[index] = {
+      ...products[index],
       ...data,
       updatedAt: new Date().toISOString(),
       // Simple merge for inventory if present
-      inventory: data.inventory ? { ...adminProducts[index].inventory, ...data.inventory } : adminProducts[index].inventory
+      inventory: data.inventory ? { ...products[index].inventory, ...data.inventory } : products[index].inventory
     };
 
-    return { data: adminProducts[index] };
+    saveStoredProducts(products);
+    return { data: products[index] };
   },
 
   disable: async (id: string) => {
     await new Promise(resolve => setTimeout(resolve, 400));
-    const index = adminProducts.findIndex(p => p.id === id);
+    const products = getStoredProducts();
+    const index = products.findIndex(p => p.id === id);
     if (index === -1) throw new Error("Product not found");
 
-    const newStatus = adminProducts[index].status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
-    adminProducts[index] = { ...adminProducts[index], status: newStatus };
+    const newStatus = products[index].status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+    products[index] = { ...products[index], status: newStatus };
 
+    saveStoredProducts(products);
     return { data: { isActive: newStatus === 'ACTIVE' } };
   },
 
   delete: async (id: string) => {
     await new Promise(resolve => setTimeout(resolve, 600));
-    const initialLen = adminProducts.length;
-    adminProducts = adminProducts.filter(p => p.id !== id);
+    const products = getStoredProducts();
+    const initialLen = products.length;
+    const newProducts = products.filter(p => p.id !== id);
 
-    if (adminProducts.length === initialLen) throw new Error("Product not found");
+    if (newProducts.length === initialLen) throw new Error("Product not found");
 
+    saveStoredProducts(newProducts);
     return { data: { success: true, message: "Product deleted" } };
   },
 };

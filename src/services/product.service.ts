@@ -1,12 +1,44 @@
 import { Product, ProductFilterInput } from '@/types/product';
 import { demoProducts } from '@/data/products';
+import { AdminProduct } from '@/features/admin/products/product.types';
+
+const STORAGE_KEY = 'MALICC_DEMO_PRODUCTS';
+
+const mapAdminToProduct = (adminP: AdminProduct): Product => ({
+    id: adminP.id,
+    name: adminP.name,
+    description: adminP.description || '',
+    image: adminP.images?.[0] || '',
+    price: adminP.price,
+    rating: '4', // Default rating as AdminProduct doesn't persist it. Type is '1'|'2'|'3'|'4'
+    category: typeof adminP.category === 'string' ? adminP.category : adminP.category?.name || '',
+    inStock: adminP.status === 'ACTIVE' && (adminP.inventory?.availableQuantity > 0),
+    createdAt: adminP.createdAt,
+});
 
 export const productService = {
     fetchProducts: async (filters?: ProductFilterInput): Promise<Product[]> => {
         // Simulate network delay
         await new Promise(resolve => setTimeout(resolve, 500));
 
-        let filteredProducts = [...demoProducts];
+        let filteredProducts: Product[] = [];
+
+        if (typeof window !== 'undefined') {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                try {
+                    const adminProducts: AdminProduct[] = JSON.parse(stored);
+                    filteredProducts = adminProducts.map(mapAdminToProduct);
+                } catch (e) {
+                    console.error("Failed to parse products from local storage", e);
+                    filteredProducts = [...demoProducts];
+                }
+            } else {
+                filteredProducts = [...demoProducts];
+            }
+        } else {
+            filteredProducts = [...demoProducts];
+        }
 
         if (filters) {
             if (filters.category) {
