@@ -1,13 +1,19 @@
-import type { NextConfig } from 'next';
+import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   // Use images.domains in development
   images: {
-    domains: [
-      'picsum.photos',
-      'ecom.myitworld.com',
-      'm.media-amazon.com',
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "atlasware.in",
+      },
     ],
+    domains: ["picsum.photos", "ecom.myitworld.com", "m.media-amazon.com"],
   },
 };
 
