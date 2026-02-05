@@ -1,43 +1,50 @@
 import { AdminUser, UserRole } from '@/features/admin/users/users.types';
 import { demoUser } from '@/data/users';
 
-// Maintain local state
-// Adding a few extra fake users for list view
-const adminUsers: AdminUser[] = [
-  {
-    ...demoUser,
-    role: UserRole.ADMIN,
-    isPhoneVerified: true, // Ensuring type compatibility if needed
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  {
-    id: 'user-demo-2',
-    username: 'John Doe',
-    email: 'john@example.com',
-    phoneNumber: '9988776655',
-    role: UserRole.CUSTOMER,
-    isAdmin: false,
-    isPhoneVerified: true,
-    createdAt: new Date(Date.now() - 100000000).toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  {
-    id: 'user-demo-3',
-    username: 'Alice Smith',
-    email: 'alice@test.com',
-    phoneNumber: '1122334455',
-    role: UserRole.CUSTOMER,
-    isAdmin: false,
-    isPhoneVerified: false,
-    createdAt: new Date(Date.now() - 200000000).toISOString(),
-    updatedAt: new Date().toISOString()
+const USER_STORAGE_KEY = 'malicc_demo_users';
+
+class UserManager {
+  private getStoredUsers(): AdminUser[] {
+    if (typeof window === 'undefined') return [];
+
+    const stored = localStorage.getItem(USER_STORAGE_KEY);
+    if (!stored) {
+      const initial: AdminUser[] = [
+        {
+          ...demoUser,
+          role: UserRole.ADMIN,
+          isPhoneVerified: true,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        }
+      ];
+      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(initial));
+      return initial;
+    }
+
+    try {
+      return JSON.parse(stored);
+    } catch {
+      return [];
+    }
   }
-];
+
+  getAll(): AdminUser[] {
+    return this.getStoredUsers();
+  }
+
+  add(user: AdminUser) {
+    const users = this.getStoredUsers();
+    users.push(user);
+    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(users));
+  }
+}
+
+export const userManager = new UserManager();
 
 export const adminUserAPI = {
   getAll: async () => {
     await new Promise(resolve => setTimeout(resolve, 600));
-    return { data: [...adminUsers] };
+    return { data: userManager.getAll() };
   },
 };
