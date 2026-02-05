@@ -1,70 +1,53 @@
-import apiClient from "./apiClient";
+import { demoCart, Cart, CartItem } from "../data/cart";
+import { demoProducts } from "../data/products";
+
+// Local cart state
+let currentCart: Cart = { ...demoCart };
 
 export const cartAPI = {
   addToCart: async (productId: string, quantity: number = 1) => {
-    const query = `
-      mutation AddToCart($input: AddToCartInput!) {
-        addToCart(input: $input) {
-          id
-          items {
-            productId
-            quantity
-            price
-            name
-          }
-          totalAmount
-          totalItems
-        }
-      }
-    `;
+    await new Promise(resolve => setTimeout(resolve, 300));
 
-    try {
-      const response = await apiClient.post("", {
-        query,
-        variables: {
-          input: {
-            productId,
-            quantity
-          }
-        },
-      });
+    const product = demoProducts.find(p => p.id === productId);
+    if (!product) throw new Error("Product not found");
 
-      if (response.data.errors) {
-        throw new Error(response.data.errors[0].message);
-      }
+    const existingItemIndex = currentCart.items.findIndex(item => item.productId === productId);
 
-      return response.data.data.addToCart;
-    } catch (error) {
-      throw error;
+    if (existingItemIndex > -1) {
+      currentCart.items[existingItemIndex].quantity += quantity;
+      // Recalculate logic if needed, simplistically:
+    } else {
+      const newItem: CartItem = {
+        productId,
+        quantity,
+        price: product.price,
+        name: product.name,
+        image: product.image
+      };
+      currentCart.items.push(newItem);
     }
+
+    // Recalculate totals
+    currentCart.totalItems = currentCart.items.reduce((sum, item) => sum + item.quantity, 0);
+    currentCart.totalAmount = currentCart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+    // Return structure expected by frontend
+    return currentCart;
   },
 
   getCart: async () => {
-    const query = `
-      query GetCart {
-        getCart {
-          id
-          items {
-            productId
-            quantity
-            price
-            name
-            image
-          }
-          totalAmount
-          totalItems
-        }
-      }
-    `;
+    await new Promise(resolve => setTimeout(resolve, 200));
+    // Return a copy so Redux doesn't freeze the mutable service state
+    return { ...currentCart, items: [...currentCart.items] };
+  },
 
-    try {
-      const response = await apiClient.post("", { query });
-      if (response.data.errors) {
-        throw new Error(response.data.errors[0].message);
-      }
-      return response.data.data.getCart;
-    } catch (error) {
-      throw error;
-    }
+  // Helper to clear cart (used in checkout)
+  clearCart: () => {
+    currentCart = {
+      id: 'cart-123',
+      items: [],
+      totalAmount: 0,
+      totalItems: 0
+    };
   }
 };
