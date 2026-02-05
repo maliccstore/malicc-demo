@@ -14,7 +14,6 @@ export default function UserTable({ roleFilter }: UserTableProps) {
     const { list: allUsers, loading } = useSelector(
         (state: RootState) => state.adminUsers
     );
-
     // Filter users based on role if roleFilter is provided
     const list = roleFilter
         ? allUsers.filter(user => user.role === roleFilter)
@@ -59,7 +58,7 @@ export default function UserTable({ roleFilter }: UserTableProps) {
                             </Flex>
                         </Table.Cell>
                         <Table.Cell>
-                            <Badge color={user.role === 'ADMIN' ? 'ruby' : user.role === 'SUPERADMIN' ? 'gold' : 'blue'}>
+                            <Badge color={user.role === UserRole.ADMIN ? 'ruby' : user.role === UserRole.SUPERADMIN ? 'gold' : 'blue'}>
                                 {user.role}
                             </Badge>
                         </Table.Cell>

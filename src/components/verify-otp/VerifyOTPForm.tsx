@@ -58,6 +58,7 @@ export default function VerifyOTPForm() {
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <Flex direction="column" gap="4">
                         <TextField.Root
+                            value={"123456"}
                             size="3"
                             placeholder="Enter 6-digit OTP"
                             {...register("otp", {

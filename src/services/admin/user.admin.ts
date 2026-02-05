@@ -1,4 +1,4 @@
-import { AdminUser } from '@/features/admin/users/users.types';
+import { AdminUser, UserRole } from '@/features/admin/users/users.types';
 import { demoUser } from '@/data/users';
 
 // Maintain local state
@@ -6,6 +6,7 @@ import { demoUser } from '@/data/users';
 const adminUsers: AdminUser[] = [
   {
     ...demoUser,
+    role: UserRole.ADMIN,
     isPhoneVerified: true, // Ensuring type compatibility if needed
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
@@ -15,7 +16,7 @@ const adminUsers: AdminUser[] = [
     username: 'John Doe',
     email: 'john@example.com',
     phoneNumber: '9988776655',
-    role: 'USER',
+    role: UserRole.CUSTOMER,
     isAdmin: false,
     isPhoneVerified: true,
     createdAt: new Date(Date.now() - 100000000).toISOString(),
@@ -26,7 +27,7 @@ const adminUsers: AdminUser[] = [
     username: 'Alice Smith',
     email: 'alice@test.com',
     phoneNumber: '1122334455',
-    role: 'USER',
+    role: UserRole.CUSTOMER,
     isAdmin: false,
     isPhoneVerified: false,
     createdAt: new Date(Date.now() - 200000000).toISOString(),
@@ -37,6 +38,6 @@ const adminUsers: AdminUser[] = [
 export const adminUserAPI = {
   getAll: async () => {
     await new Promise(resolve => setTimeout(resolve, 600));
-    return { data: adminUsers };
+    return { data: [...adminUsers] };
   },
 };
