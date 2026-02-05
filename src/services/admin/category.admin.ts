@@ -1,173 +1,86 @@
-import apiClient from '@/services/apiClient';
 import { AdminCategory } from '@/features/admin/categories/category.types';
+import { demoCategories } from '@/data/categories';
+import { Category } from '@/types/category';
+
+// Map generic demo Category to AdminCategory
+const mapCategoryToAdmin = (c: Category): AdminCategory => ({
+  id: c.id,
+  name: c.name,
+  slug: c.slug,
+  description: c.description || '',
+  isActive: c.isActive,
+  sortOrder: c.sortOrder || 0,
+  parentId: c.parentId || undefined,
+  children: c.children ? c.children.map(mapCategoryToAdmin) : [],
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString()
+});
+
+let adminCategories = demoCategories.map(mapCategoryToAdmin);
 
 export const adminCategoryAPI = {
-    getAll: async (filters?: { isActive?: boolean; search?: string }) => {
-        const query = `
-      query GetCategories($filters: CategoryFilterInput) {
-        categories(filters: $filters) {
-          success
-          message
-          totalCount
-          categories {
-            id
-            name
-            slug
-            description
-            isActive
-            sortOrder
-            parentId
-            parent {
-              id
-              name
-            }
-            children {
-              id
-              name
-              slug
-            }
-            createdAt
-            updatedAt
-          }
-        }
-      }
-    `;
+  getAll: async (filters?: { isActive?: boolean; search?: string }) => {
+    await new Promise(resolve => setTimeout(resolve, 400));
 
-        const response = await apiClient.post('', {
-            query,
-            variables: { filters },
-        });
+    let filtered = [...adminCategories];
+    if (filters?.search) {
+      const s = filters.search.toLowerCase();
+      filtered = filtered.filter(c => c.name.toLowerCase().includes(s));
+    }
+    if (filters?.isActive !== undefined) {
+      filtered = filtered.filter(c => c.isActive === filters.isActive);
+    }
 
-        if (response.data.errors) throw new Error(response.data.errors[0].message);
+    return {
+      data: filtered,
+      totalCount: filtered.length
+    };
+  },
 
-        // Ensure we return the correct structure
-        const result = response.data.data.categories;
-        return {
-            data: result.categories as AdminCategory[],
-            totalCount: result.totalCount
-        };
-    },
+  getById: async (id: string) => {
+    await new Promise(resolve => setTimeout(resolve, 200));
+    const cat = adminCategories.find(c => c.id === id);
+    if (!cat) throw new Error("Category not found");
+    return { data: cat };
+  },
 
-    getById: async (id: string) => {
-        const query = `
-      query GetCategory($id: String!) {
-        category(id: $id) {
-          success
-          message
-          category {
-            id
-            name
-            slug
-            description
-            isActive
-            sortOrder
-            parentId
-            parent {
-              id
-              name
-            }
-          }
-        }
-      }
-    `;
-        const response = await apiClient.post('', { query, variables: { id } });
-        if (response.data.errors) throw new Error(response.data.errors[0].message);
+  create: async (data: Partial<AdminCategory>) => {
+    await new Promise(resolve => setTimeout(resolve, 600));
+    const newCat: AdminCategory = {
+      id: `cat-${Date.now()}`,
+      name: data.name || 'New Category',
+      slug: data.slug || `cat-${Date.now()}`,
+      description: data.description || '',
+      isActive: data.isActive ?? true,
+      sortOrder: data.sortOrder || 0,
+      parentId: data.parentId || undefined,
+      children: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    adminCategories.push(newCat);
+    return { data: newCat };
+  },
 
-        const result = response.data.data.category;
-        if (!result.success) throw new Error(result.message);
+  update: async (id: string, data: Partial<AdminCategory>) => {
+    await new Promise(resolve => setTimeout(resolve, 600));
+    const index = adminCategories.findIndex(c => c.id === id);
+    if (index === -1) throw new Error("Category not found");
 
-        return { data: result.category as AdminCategory };
-    },
+    adminCategories[index] = {
+      ...adminCategories[index],
+      ...data,
+      updatedAt: new Date().toISOString()
+    };
+    return { data: adminCategories[index] };
+  },
 
-    create: async (data: Partial<AdminCategory>) => {
-        const query = `
-      mutation CreateCategory($input: CreateCategoryInput!) {
-        createCategory(input: $input) {
-          success
-          message
-          category {
-            id
-            name
-            slug
-            description
-            isActive
-            sortOrder
-            parentId
-          }
-        }
-      }
-    `;
+  delete: async (id: string) => {
+    await new Promise(resolve => setTimeout(resolve, 400));
+    const initialLen = adminCategories.length;
+    adminCategories = adminCategories.filter(c => c.id !== id);
+    if (adminCategories.length === initialLen) throw new Error("Category not found");
 
-        const input = {
-            name: data.name,
-            slug: data.slug,
-            description: data.description,
-            isActive: data.isActive,
-            parentId: data.parentId || null, // Ensure explicit null if undefined
-            sortOrder: data.sortOrder,
-        };
-
-        const response = await apiClient.post('', { query, variables: { input } });
-        if (response.data.errors) throw new Error(response.data.errors[0].message);
-
-        const result = response.data.data.createCategory;
-        if (!result.success) throw new Error(result.message);
-
-        return { data: result.category as AdminCategory };
-    },
-
-    update: async (id: string, data: Partial<AdminCategory>) => {
-        const query = `
-      mutation UpdateCategory($id: String!, $input: UpdateCategoryInput!) {
-        updateCategory(id: $id, input: $input) {
-          success
-          message
-          category {
-            id
-            name
-            slug
-            description
-            isActive
-            sortOrder
-            parentId
-          }
-        }
-      }
-    `;
-
-        const input = {
-            name: data.name,
-            slug: data.slug,
-            description: data.description,
-            isActive: data.isActive,
-            parentId: data.parentId || null,
-            sortOrder: data.sortOrder,
-        };
-
-        const response = await apiClient.post('', { query, variables: { id, input } });
-        if (response.data.errors) throw new Error(response.data.errors[0].message);
-
-        const result = response.data.data.updateCategory;
-        if (!result.success) throw new Error(result.message);
-
-        return { data: result.category as AdminCategory };
-    },
-
-    delete: async (id: string) => {
-        const query = `
-      mutation DeleteCategory($id: String!) {
-        deleteCategory(id: $id) {
-          success
-          message
-        }
-      }
-    `;
-        const response = await apiClient.post('', { query, variables: { id } });
-        if (response.data.errors) throw new Error(response.data.errors[0].message);
-
-        const result = response.data.data.deleteCategory;
-        if (!result.success) throw new Error(result.message);
-
-        return { data: result };
-    },
+    return { data: { success: true, message: "Category deleted" } };
+  },
 };
