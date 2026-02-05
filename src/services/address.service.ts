@@ -1,135 +1,60 @@
-import apiClient from "./apiClient";
-
 import { Address, CreateAddressInput, UpdateAddressInput } from "../types/address";
+import { demoAddresses } from "../data/addresses";
+
+// Maintain local state for addresses
+let userAddresses: Address[] = [...demoAddresses];
 
 export const addressAPI = {
     getUserAddresses: async (): Promise<Address[]> => {
-        const query = `
-      query GetUserAddresses {
-        getUserAddresses {
-          id
-          fullName
-          phoneNumber
-          addressLine1
-          addressLine2
-          city
-          state
-          postalCode
-          country
-          isDefault
-        }
-      }
-    `;
-
-        try {
-            const response = await apiClient.post("", { query });
-
-            if (response.data.errors) {
-                throw new Error(response.data.errors[0].message);
-            }
-
-            return response.data.data.getUserAddresses;
-        } catch (error) {
-            throw error;
-        }
+        await new Promise(resolve => setTimeout(resolve, 400));
+        return userAddresses;
     },
 
     createAddress: async (input: CreateAddressInput): Promise<Address> => {
-        const query = `
-      mutation CreateAddress($input: CreateAddressInput!) {
-        createAddress(input: $input) {
-          id
-          fullName
-          phoneNumber
-          addressLine1
-          addressLine2
-          city
-          state
-          postalCode
-          country
-          isDefault
+        await new Promise(resolve => setTimeout(resolve, 600));
+
+        const newAddress: Address = {
+            id: `addr-${Date.now()}`,
+            ...input,
+            addressLine2: input.addressLine2 || '',
+            country: input.country || "IN",
+            isDefault: input.isDefault || false
+        };
+
+        if (newAddress.isDefault) {
+            userAddresses = userAddresses.map(addr => ({ ...addr, isDefault: false }));
         }
-      }
-    `;
 
-        try {
-            // Ensure defaults
-            const payload = {
-                ...input,
-                country: input.country || "IN",
-                isDefault: input.isDefault || false
-            }
-            const response = await apiClient.post("", {
-                query,
-                variables: { input: payload },
-            });
-
-            if (response.data.errors) {
-                throw new Error(response.data.errors[0].message);
-            }
-
-            return response.data.data.createAddress;
-        } catch (error) {
-            throw error;
-        }
+        userAddresses.push(newAddress);
+        return newAddress;
     },
 
     updateAddress: async (id: string, input: UpdateAddressInput): Promise<Address> => {
-        const query = `
-      mutation UpdateAddress($id: ID!, $input: UpdateAddressInput!) {
-        updateAddress(id: $id, input: $input) {
-          id
-          fullName
-          phoneNumber
-          addressLine1
-          addressLine2
-          city
-          state
-          postalCode
-          country
-          isDefault
+        await new Promise(resolve => setTimeout(resolve, 600));
+
+        const index = userAddresses.findIndex(a => a.id === id);
+        if (index === -1) throw new Error("Address not found");
+
+        if (input.isDefault) {
+            userAddresses = userAddresses.map(addr => ({ ...addr, isDefault: false }));
         }
-      }
-    `;
 
-        try {
-            const response = await apiClient.post("", {
-                query,
-                variables: { id, input },
-            });
+        userAddresses[index] = {
+            ...userAddresses[index],
+            ...input
+        };
 
-            if (response.data.errors) {
-                throw new Error(response.data.errors[0].message);
-            }
-
-            return response.data.data.updateAddress;
-        } catch (error) {
-            throw error;
-        }
+        return userAddresses[index];
     },
 
     deleteAddress: async (id: string): Promise<boolean> => {
-        const query = `
-        mutation DeleteAddress($id: ID!) {
-            deleteAddress(id: $id)
-        }
-    `;
-        try {
-            const response = await apiClient.post("", {
-                query,
-                variables: { id }
-            });
-            if (response.data.errors) {
-                throw new Error(response.data.errors[0].message);
-            }
-            return response.data.data.deleteAddress;
-        } catch (error) {
-            throw error;
-        }
+        await new Promise(resolve => setTimeout(resolve, 400));
+        const initialLength = userAddresses.length;
+        userAddresses = userAddresses.filter(a => a.id !== id);
+        return userAddresses.length < initialLength;
     },
 
     setDefaultAddress: async (id: string): Promise<Address> => {
-        // We use updateAddress which handles isDefault logic for Customers.
         return await addressAPI.updateAddress(id, { isDefault: true });
     }
 };
