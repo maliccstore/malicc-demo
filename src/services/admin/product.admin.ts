@@ -26,7 +26,7 @@ let adminProducts = demoProducts.map(mapProductToAdmin);
 export const adminProductAPI = {
   getAll: async () => {
     await new Promise(resolve => setTimeout(resolve, 500));
-    return { data: adminProducts };
+    return { data: [...adminProducts] };
   },
 
   getById: async (id: string) => {
