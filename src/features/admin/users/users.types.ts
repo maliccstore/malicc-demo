@@ -5,11 +5,12 @@ export enum UserRole {
 }
 
 export interface AdminUser {
-    id: number;
+    id: string;
     username?: string;
     phoneNumber: string;
     isPhoneVerified: boolean;
     role: UserRole;
+    isAdmin: boolean;
     email?: string;
     createdAt: string;
     updatedAt: string;

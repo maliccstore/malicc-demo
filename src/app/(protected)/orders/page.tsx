@@ -65,7 +65,7 @@ export default function OrdersPage() {
                                         <Text size="2">Order <Text color="gray">#{order.id.slice(0, 9)}...</Text></Text>
                                         <Flex gap={{ initial: '4', sm: '1' }} direction={{ initial: 'row', sm: 'column' }}>
                                             <Text size="2" color="gray">Items: <Text weight="bold">{order.items.length}</Text></Text>
-                                            <Text size="2" color="gray">Total: <Text weight="bold">${order.totalAmount}</Text></Text>
+                                            <Text size="2" color="gray">Total: <Text weight="bold">₹{order.totalAmount}</Text></Text>
                                         </Flex>
                                     </Flex>
 
@@ -96,6 +96,9 @@ function getStatusColor(status: string) {
         case 'CREATED': return 'gray';
         case 'PAYMENT_PENDING': return 'orange';
         case 'PAID': return 'blue';
+        case 'PROCESSING': return 'orange';
+        case 'SHIPPED': return 'indigo';
+        case 'DELIVERED': return 'green';
         case 'FULFILLED': return 'green';
         case 'CANCELLED': return 'red';
         case 'FAILED': return 'red';

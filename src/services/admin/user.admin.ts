@@ -1,37 +1,50 @@
-import apiClient from '@/services/apiClient';
-import { AdminUser } from '@/features/admin/users/users.types';
+import { AdminUser, UserRole } from '@/features/admin/users/users.types';
+import { demoUser } from '@/data/users';
 
-// Helper to map backend response to frontend types
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const mapUserFromGQL = (u: any): AdminUser => ({
-  id: u.id,
-  username: u.username,
-  phoneNumber: u.phoneNumber,
-  isPhoneVerified: u.isPhoneVerified,
-  role: u.role,
-  email: u.email,
-  createdAt: u.createdAt,
-  updatedAt: u.updatedAt,
-});
+const USER_STORAGE_KEY = 'malicc_demo_users';
+
+class UserManager {
+  private getStoredUsers(): AdminUser[] {
+    if (typeof window === 'undefined') return [];
+
+    const stored = localStorage.getItem(USER_STORAGE_KEY);
+    if (!stored) {
+      const initial: AdminUser[] = [
+        {
+          ...demoUser,
+          role: UserRole.ADMIN,
+          isPhoneVerified: true,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        }
+      ];
+      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(initial));
+      return initial;
+    }
+
+    try {
+      return JSON.parse(stored);
+    } catch {
+      return [];
+    }
+  }
+
+  getAll(): AdminUser[] {
+    return this.getStoredUsers();
+  }
+
+  add(user: AdminUser) {
+    const users = this.getStoredUsers();
+    users.push(user);
+    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(users));
+  }
+}
+
+export const userManager = new UserManager();
 
 export const adminUserAPI = {
   getAll: async () => {
-    const query = `
-      query GetAllUsers {
-        users {
-          id
-          username
-          phoneNumber
-          isPhoneVerified
-          role
-          email
-          createdAt
-          updatedAt
-        }
-      }
-    `;
-    const response = await apiClient.post('', { query });
-    if (response.data.errors) throw new Error(response.data.errors[0].message);
-    return { data: response.data.data.users.map(mapUserFromGQL) };
+    await new Promise(resolve => setTimeout(resolve, 600));
+    return { data: userManager.getAll() };
   },
 };
