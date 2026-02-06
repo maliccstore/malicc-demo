@@ -83,6 +83,13 @@ export const orderAPI = {
         paymentMethod: 'COD',
         shippingMethod: 'Standard',
         updatedAt: order.createdAt,
+        shippingAddress: order.shippingAddress ? {
+          ...order.shippingAddress,
+          fullName: order.shippingAddress.fullName || '',
+          phoneNumber: order.shippingAddress.phoneNumber || '',
+          postalCode: order.shippingAddress.postalCode || '',
+          country: order.shippingAddress.country || '',
+        } : undefined,
       }
     };
   },

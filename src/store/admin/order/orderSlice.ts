@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { fetchAdminOrders, updateAdminOrderStatus } from './orderThunks';
-import { OrderStatus } from '@/services/admin/order.admin';
+import { OrderStatus, FulfillmentStatus } from '@/services/admin/order.admin';
 
 interface OrderItem {
     id: string;
@@ -11,6 +11,7 @@ interface OrderItem {
 interface Order {
     id: string;
     status: OrderStatus;
+    fulfillmentStatus?: FulfillmentStatus;
     totalAmount: number;
     currency: string;
     createdAt: string;
