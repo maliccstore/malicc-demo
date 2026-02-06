@@ -11,8 +11,11 @@ import authReducer from './slices/authSlice';
 import wishlistReducer from './slices/wishlistSlice';
 import orderReducer from './slices/orderSlice';
 import { loadState, saveState } from './cartPersist';
+import { loadWishlistState } from './wishlistPersist';
+
 const preloadedState = {
   cart: loadState() || undefined,
+  wishlist: loadWishlistState() || undefined,
 };
 
 export const makeStore = () => {
@@ -33,10 +36,7 @@ export const makeStore = () => {
     preloadedState,
   });
 };
-const store = makeStore();
-store.subscribe(() => {
-  saveState(store.getState());
-});
+// Store subscription moved to ReduxProvider
 
 // Infer the type of makeStore
 export type AppStore = ReturnType<typeof makeStore>;
