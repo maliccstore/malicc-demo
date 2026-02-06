@@ -86,13 +86,13 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
                                                     <Text weight="medium" className="block text-lg mb-1">{item.productName}</Text>
                                                     <Text size="2" color="gray" className="block break-all">Product ID: {item.productId}</Text>
                                                 </Box>
-                                                <Text weight="bold" size="4" className="self-end sm:self-auto">${item.totalPrice}</Text>
+                                                <Text weight="bold" size="4" className="self-end sm:self-auto">₹{item.totalPrice}</Text>
                                             </Flex>
                                             <Flex align="center" justify={{ initial: "between", sm: "start" }} gap={{ initial: "0", sm: "4" }}>
                                                 <Flex gap="4">
                                                     <Text>Qty: {item.quantity}</Text>
                                                     <Text>×</Text>
-                                                    <Text>${item.unitPrice}</Text>
+                                                    <Text>₹{item.unitPrice}</Text>
                                                 </Flex>
                                             </Flex>
                                         </Box>
@@ -110,20 +110,20 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
                         <Flex direction="column" gap="3" className="text-sm">
                             <Flex justify="between">
                                 <Text>Subtotal</Text>
-                                <Text>${order.subtotal}</Text>
+                                <Text>₹{order.subtotal}</Text>
                             </Flex>
                             <Flex justify="between">
                                 <Text>Shipping</Text>
-                                <Text>${order.shippingFee}</Text>
+                                <Text>₹{order.shippingFee}</Text>
                             </Flex>
                             <Flex justify="between">
                                 <Text>Tax</Text>
-                                <Text>${order.tax}</Text>
+                                <Text>₹{order.tax}</Text>
                             </Flex>
                             <Separator />
                             <Flex justify="between">
                                 <Text>Total</Text>
-                                <Text>${order.totalAmount}</Text>
+                                <Text>₹{order.totalAmount}</Text>
                             </Flex>
                         </Flex>
                     </Card>
@@ -196,10 +196,13 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
 
 function getStatusColor(status: string) {
     switch (status) {
-        case 'CREATED': return 'blue';
+        case 'CREATED': return 'gray';
+        case 'PAYMENT_PENDING': return 'orange';
+        case 'PAID': return 'blue';
         case 'PROCESSING': return 'orange';
         case 'SHIPPED': return 'indigo';
         case 'DELIVERED': return 'green';
+        case 'FULFILLED': return 'green';
         case 'CANCELLED': return 'red';
         case 'FAILED': return 'red';
         default: return 'gray';

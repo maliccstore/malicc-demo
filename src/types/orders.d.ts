@@ -1,13 +1,19 @@
 export interface Order {
     id: string;
     status: string;
+    fulfillmentStatus: string;
     totalAmount: number;
     createdAt: string | number;
     items: OrderItem[];
     shippingAddress?: {
+        fullName?: string;
+        phoneNumber?: string;
         addressLine1: string;
+        addressLine2?: string;
         city: string;
         state: string;
+        postalCode?: string;
+        country?: string;
     };
 }
 
@@ -25,6 +31,7 @@ export interface OrderItem {
 export interface OrderDetail {
     id: string;
     status: string;
+    fulfillmentStatus?: string;
     subtotal: number;
     tax: number;
     shippingFee: number;

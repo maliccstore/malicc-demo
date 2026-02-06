@@ -77,6 +77,7 @@ export default function LoginForm() {
         <form onSubmit={handleSubmit(onSubmit)}>
           <Flex direction="column" gap="4">
             <TextField.Root
+              value={"9876543210"}
               size="3"
               placeholder="Phone Number"
               type="tel"
