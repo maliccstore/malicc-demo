@@ -23,6 +23,15 @@ import {
   Separator,
 } from '@radix-ui/themes';
 import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer
+} from 'recharts';
+import {
   getDashboardStats,
   getRecentActivity,
   getRevenueData,
@@ -110,34 +119,57 @@ export default function DashboardPage() {
       </Grid>
 
       <Grid gap="6">
-        {/* Revenue Chart - Custom implementation */}
+        {/* Revenue Chart - Recharts Implementation */}
         <Card className="col-span-2 overflow-hidden bg-white/50 backdrop-blur-sm border-slate-200">
           <Flex direction="column" gap="4" p="5">
             <Flex justify="between" align="center">
               <Heading size="4">Revenue Insights</Heading>
               <Badge variant="soft" color="indigo">Last 6 Months</Badge>
             </Flex>
-            <Box className="mt-4 relative flex items-end justify-between gap-2 px-2">
-              {revenueData.map((item, idx) => (
-                <Flex key={idx} direction="column" align="center" gap="2" className="flex-1 group">
-                  <Box
-                    className="w-full bg-indigo-500/80 rounded-t-lg transition-all duration-500 group-hover:bg-indigo-600 relative overflow-hidden"
-                    style={{ height: `${Math.max((item.revenue / (Math.max(...revenueData.map(d => d.revenue)) || 10000)) * 100, 5)}%` }}
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent" />
-                    <div className="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] px-2 py-1 rounded transition-opacity whitespace-nowrap z-10">
-                      ₹{item.revenue}
-                    </div>
-                  </Box>
-                  <Text size="1" color="gray" className="font-medium">{item.month}</Text>
-                </Flex>
-              ))}
-              {/* Horizontal grid lines */}
-              <div className="absolute inset-0 -z-10 flex flex-col justify-between opacity-10 pointer-events-none pb-6">
-                {[...Array(5)].map((_, i) => (
-                  <div key={i} className="border-t border-slate-900 w-full" />
-                ))}
-              </div>
+            <Box className="h-[300px] w-full mt-4">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={revenueData}
+                  margin={{
+                    top: 5,
+                    right: 30,
+                    left: 20,
+                    bottom: 5,
+                  }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                  <XAxis
+                    dataKey="month"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: '#64748b', fontSize: 12 }}
+                    dy={10}
+                  />
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: '#64748b', fontSize: 12 }}
+                    tickFormatter={(value) => `₹${value}`}
+                  />
+                  <Tooltip
+                    cursor={{ fill: '#f1f5f9' }}
+                    contentStyle={{
+                      borderRadius: '8px',
+                      border: 'none',
+                      boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                      backgroundColor: '#1e293b',
+                      color: '#fff'
+                    }}
+                    formatter={(value: number | undefined) => [`₹${value ?? 0}`, 'Revenue']}
+                  />
+                  <Bar
+                    dataKey="revenue"
+                    fill="#6366f1"
+                    radius={[4, 4, 0, 0]}
+                    barSize={40}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
             </Box>
           </Flex>
         </Card>
@@ -188,7 +220,6 @@ interface StatsCardProps {
   color: string;
 }
 
-// Stats Card Component
 function StatsCard({ title, value, growth, icon, color }: StatsCardProps) {
   const isPositive = growth >= 0;
   return (
