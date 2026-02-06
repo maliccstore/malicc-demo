@@ -7,13 +7,12 @@ import { Product } from '@/types/product';
 import { Box, Container, Heading, Text } from '@radix-ui/themes';
 import ProductDetailsSkeleton from '@/components/products/ProductDetailsSkeleton';
 import Image from 'next/image';
-import { addToCart } from '@/store/slices/cartSlice';
+import { Button } from '@/components/ui/Button';
+import { addToCart, removeFromCart } from '@/store/slices/cartSlice';
 import { Image as ImageIcon } from 'lucide-react';
-
 import { useEffect } from 'react';
 import { fetchProducts } from '@/store/slices/productSlice';
 import { AppDispatch } from '@/store';
-import { Button } from '@/components/ui/Button';
 
 const ProductPage = () => {
   const params = useParams();
@@ -25,6 +24,10 @@ const ProductPage = () => {
 
   // Get product from Redux store - Use loose comparison or string conversion to be safe
   const product = products.find((p: Product) => String(p.id) === String(productId));
+
+  const cartItem = useSelector((state: RootState) =>
+    product ? state.cart.items.find(item => item.id === product.id) : undefined
+  );
 
   useEffect(() => {
     if (products.length === 0) {
@@ -80,12 +83,32 @@ const ProductPage = () => {
         </Text>
       </div>
       <div className="sticky bottom-12 flex justify-center">
-        <Button
-          onClick={handleAddToCart}
-          className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors max-w-md w-full"
-        >
-          Add to Cart
-        </Button>
+        {cartItem ? (
+          <div className="flex items-center justify-between max-w-[200px] w-full border border-gray-200 rounded-lg bg-white shadow-sm overflow-hidden">
+            <Button
+              onClick={() => dispatch(removeFromCart(String(product.id)))}
+              className="h-12 w-14 !p-0 !bg-transparent !text-gray-600 hover:!bg-gray-50 flex items-center justify-center rounded-none border-r border-gray-100 transition-colors"
+            >
+              -
+            </Button>
+            <span className="text-lg font-semibold w-12 text-center text-gray-900">
+              {cartItem.quantity}
+            </span>
+            <Button
+              onClick={() => dispatch(addToCart(product))}
+              className="h-12 w-14 !p-0 !bg-transparent !text-gray-600 hover:!bg-gray-50 flex items-center justify-center rounded-none border-l border-gray-100 transition-colors"
+            >
+              +
+            </Button>
+          </div>
+        ) : (
+          <Button
+            onClick={handleAddToCart}
+            className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors max-w-md w-full"
+          >
+            Add to Cart
+          </Button>
+        )}
       </div>
     </Container>
   );
