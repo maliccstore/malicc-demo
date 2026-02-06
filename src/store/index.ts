@@ -33,10 +33,7 @@ export const makeStore = () => {
     preloadedState,
   });
 };
-const store = makeStore();
-store.subscribe(() => {
-  saveState(store.getState());
-});
+// Store subscription moved to ReduxProvider
 
 // Infer the type of makeStore
 export type AppStore = ReturnType<typeof makeStore>;
