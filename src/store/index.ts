@@ -10,7 +10,7 @@ import adminUsers from './admin/users/usersSlice';
 import authReducer from './slices/authSlice';
 import wishlistReducer from './slices/wishlistSlice';
 import orderReducer from './slices/orderSlice';
-import { loadState, saveState } from './cartPersist';
+import { loadState } from './cartPersist';
 import { loadWishlistState } from './wishlistPersist';
 
 const preloadedState = {
