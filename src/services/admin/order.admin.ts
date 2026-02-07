@@ -44,11 +44,11 @@ export const getAllOrders = async (filters?: OrderFilterInput) => {
   // Map to Admin Order List View structure
   const mappedOrders = result.map(o => ({
     id: o.id,
-    status: o.status,
-    fulfillmentStatus: o.fulfillmentStatus,
+    status: o.status as OrderStatus,
+    fulfillmentStatus: o.fulfillmentStatus as FulfillmentStatus,
     totalAmount: o.totalAmount,
     currency: 'INR',
-    createdAt: o.createdAt,
+    createdAt: String(o.createdAt),
     shippingAddress: {
       // Use actual name if available, fallback to Demo User
       fullName: o.shippingAddress?.fullName || 'Demo User'
@@ -74,7 +74,7 @@ export const updateOrderStatus = async (id: string, status: OrderStatus) => {
       message: "Status updated",
       order: {
         id: id,
-        status: order.status
+        status: order.status as OrderStatus
       }
     };
   } catch {
@@ -92,7 +92,7 @@ export const updateFulfillmentStatus = async (id: string, status: FulfillmentSta
       message: "Fulfillment status updated",
       order: {
         id: id,
-        fulfillmentStatus: order.fulfillmentStatus
+        fulfillmentStatus: order.fulfillmentStatus as FulfillmentStatus
       }
     };
   } catch {
