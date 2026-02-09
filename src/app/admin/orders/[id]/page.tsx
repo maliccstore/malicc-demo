@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { getOrderDetails, updateOrderStatus, updateFulfillmentStatus, ORDER_STATUS, OrderStatus, FULFILLMENT_STATUS, FulfillmentStatus } from '@/services/admin/order.admin';
-import { Box, Card, Flex, Grid, Heading, Table, Text, Select } from '@radix-ui/themes';
+import { Box, Card, Flex, Heading, Table, Text, Select } from '@radix-ui/themes';
 import { formatCurrency } from '@/utils/format';
 import { toast } from 'react-hot-toast';
 import { Order } from '@/features/admin/orders/order.types';
@@ -101,19 +101,13 @@ export default function OrderDetailPage() {
             </Table.Body>
           </Table.Root>
         </Card>
-        {/* Payment & Shipping */}
+        {/* Shipping */}
         <Card size="3">
-          <Heading size="4" mb="4">Payment & Shipping</Heading>
-          <Grid columns="2" gap="4">
-            <Box>
-              <Text weight="bold" as="div">Payment Method</Text>
-              <Text>{order.paymentMethod || 'N/A'}</Text>
-            </Box>
-            <Box>
-              <Text weight="bold" as="div">Shipping Method</Text>
-              <Text>{order.shippingMethod || 'Standard'}</Text>
-            </Box>
-          </Grid>
+          <Heading size="4" mb="4">Shipping</Heading>
+          <Box>
+            <Text weight="bold" as="div">Shipping Method</Text>
+            <Text>{order.shippingMethod || 'Standard'}</Text>
+          </Box>
         </Card>
         {/* Order Summary */}
         <Card size="3">

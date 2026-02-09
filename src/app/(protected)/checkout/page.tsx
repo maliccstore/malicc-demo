@@ -9,7 +9,7 @@ import { orderAPI } from '@/services/orderAPI';
 import { Address } from '@/types/address';
 import toast from 'react-hot-toast';
 import { Card, Heading, Text, Badge } from '@radix-ui/themes';
-import { MapPin, Truck, CreditCard } from 'lucide-react';
+import { MapPin, Truck } from 'lucide-react';
 import Link from 'next/link';
 
 export default function CheckoutPage() {
@@ -127,19 +127,6 @@ export default function CheckoutPage() {
                 </Link>
               </div>
             )}
-          </Card>
-
-          {/* Payment Method Section (Fixed to COD) */}
-          <Card className="p-6">
-            <div className="flex items-center gap-3 mb-4 border-b border-gray-100 pb-4">
-              <CreditCard className="text-green-600" size={24} />
-              <Heading size="4" className="font-semibold">Payment Method</Heading>
-            </div>
-
-            <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-100">
-              <div className="w-4 h-4 rounded-full bg-green-500"></div>
-              <span className="font-medium text-gray-900">Cash on Delivery (COD)</span>
-            </div>
           </Card>
 
           {/* Order Items Review */}
