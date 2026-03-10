@@ -7,7 +7,13 @@ export const loadState = () => {
 
   try {
     const serializedState = localStorage.getItem('cartState');
-    return serializedState ? JSON.parse(serializedState) : undefined;
+    if (!serializedState) return undefined;
+    const parsed = JSON.parse(serializedState);
+    return {
+      ...parsed,
+      couponCode: parsed.couponCode || null,
+      discountAmount: typeof parsed.discountAmount === 'number' && !isNaN(parsed.discountAmount) ? parsed.discountAmount : 0,
+    };
   } catch (err) {
     console.error('Failed to load state:', err);
     return undefined;
