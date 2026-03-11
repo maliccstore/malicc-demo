@@ -18,7 +18,7 @@ const CartItems = () => {
       <h2 className="text-lg font-semibold mb-4">Items in your cart</h2>
 
       <ul className="divide-y ">
-        {items.map((item) => (
+        {(items || []).map((item) => (
           <li key={item.id} className="py-4 flex">
             <div className="flex-shrink-0 w-24 h-24 rounded-md overflow-hidden bg-gray-100 flex items-center justify-center">
               {item.image ? (

@@ -24,7 +24,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   const isInWishlist = wishlistItems.some((item) => item.id === product.id);
 
   const cartItem = useSelector((state: RootState) =>
-    state.cart.items.find(item => item.id === product.id)
+    (state.cart.items || []).find(item => item.id === product.id)
   );
 
   const handleClick = () => {
