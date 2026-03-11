@@ -2,7 +2,7 @@
 
 import { useEffect, use } from 'react';
 import { Heading, Text, Card, Badge, Separator, Box, Flex, Button } from '@radix-ui/themes';
-import { Package, MapPin, AlertCircle, ChevronLeft, CreditCard, Truck, Calendar, Copy } from 'lucide-react';
+import { Package, MapPin, AlertCircle, ChevronLeft, Truck, Calendar, Copy } from 'lucide-react';
 import Link from 'next/link';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchOrderDetails, clearCurrentOrder } from '@/store/slices/orderSlice';
@@ -148,17 +148,10 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
                         )}
                     </Card>
 
-                    {/* Payment & Method */}
+                    {/* Shipping */}
                     <Card className="p-6 shadow-sm ring-1 ring-gray-200">
-                        <Heading size="3" className='mb-4'>Payment & Shipping</Heading>
+                        <Heading size="3" className='mb-4'>Shipping</Heading>
                         <Flex direction="column" gap="4">
-                            <Flex align="start" gap="3">
-                                <CreditCard size={18} />
-                                <Box>
-                                    <Text weight="medium" size="2">Payment Method: </Text>
-                                    <Text size="1" color="gray">{order.paymentMethod || 'N/A'}</Text>
-                                </Box>
-                            </Flex>
                             <Flex align="start" gap="3">
                                 <Truck size={18} />
                                 <Box>

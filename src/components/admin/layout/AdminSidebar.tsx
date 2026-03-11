@@ -64,6 +64,24 @@ export default function AdminSidebar() {
       link: '/admin/catalog/categories',
     },
     {
+      id: "coupons",
+      label: "Coupons",
+      icon: <FileTextIcon />,
+      items: [
+        {
+          id: "all-coupons",
+          label: "All Coupons",
+          link: "/admin/catalog/coupons",
+        },
+        {
+          id: "new-coupon",
+          label: "New Coupon",
+          link: "/admin/catalog/coupons/new",
+        },
+      ],
+      link: "/admin/catalog/coupons",
+    },
+    {
       id: 'settings',
       label: 'Settings',
       icon: <GearIcon />,
